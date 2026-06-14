@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Restaurant Mile | Abholung & Party-Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fefaf5;
+            color: #4a5b6e;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7e9eb5, #9bb7cc);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.18);
+            border-radius: 30px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.32);
+        }
+
+        .hours-banner {
+            background: #e0e8f0;
+            color: #6a7e8e;
+            text-align: center;
+            padding: 0.8rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .menu-section {
+            flex: 2;
+            min-width: 280px;
+        }
+
+        .category {
+            margin-bottom: 2.5rem;
+        }
+
+        .category h2 {
+            font-size: 1.6rem;
+            border-left: 4px solid #b0c4d8;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+            color: #5a6e7e;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .menu-card {
+            background: #ffffffea;
+            border-radius: 20px;
+            padding: 1.2rem;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+            transition: transform 0.2s;
+            border: 1px solid #e2e9f0;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-3px);
+            background: white;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .menu-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #5a6e7e;
+        }
+
+        .menu-price {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #8aacbf;
+        }
+
+        .menu-desc {
+            color: #9aabb8;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .menu-extras {
+            margin: 0.8rem 0;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e8eef3;
+        }
+
+        .extra-label {
+            display: block;
+            font-size: 0.85rem;
+            margin: 0.3rem 0;
+            cursor: pointer;
+            color: #8a9bb0;
+        }
+
+        .extra-label input {
+            margin-right: 0.5rem;
+        }
+
+        .sauce-group, .rice-group {
+            background: #eef3f8;
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .group-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6a7e8e;
+            margin-bottom: 0.3rem;
+        }
+
+        .spicy-mild { color: #27ae60; font-size: 0.7rem; }
+        .spicy-hot { color: #e67e22; font-size: 0.7rem; }
+        .spicy-very { color: #e74c3c; font-size: 0.7rem; }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 0.8rem 0;
+        }
+
+        .qty-btn {
+            background: #e8eef3;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #6a7e8e;
+        }
+
+        .qty-number {
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .add-to-cart {
+            background: #7e9eb5;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .cart-sidebar {
+            flex: 1;
+            min-width: 340px;
+            position: sticky;
+            top: 1rem;
+            align-self: flex-start;
+        }
+
+        .cart-card, .party-card {
+            background: #ffffffea;
+            border-radius: 24px;
+            padding: 1.2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            border: 1px solid #e2e9f0;
+            margin-bottom: 1.5rem;
+        }
+
+        .cart-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e8eef3;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .clear-cart {
+            background: none;
+            border: none;
+            color: #9bb7cc;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #e8eef3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info {
+            flex: 2;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-price {
+            font-weight: 500;
+            color: #8aacbf;
+            margin: 0 0.5rem;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: #b0c4d8;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #e8eef3;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .pickup-datetime {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pickup-datetime label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #5a6e7e;
+        }
+
+        .pickup-note {
+            background: #eef3f8;
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.75rem;
+            color: #6a7e8e;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .pickup-datetime select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #e2e9f0;
+            border-radius: 28px;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* 支付方式样式 */
+        .payment-methods {
+            margin-top: 1rem;
+        }
+        .payment-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #5a6e7e;
+        }
+        .payment-buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .pay-btn {
+            background: #8aacbf;
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 40px;
+            flex: 1;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .pay-btn-cash {
+            background: #27ae60;
+        }
+        .pay-btn-cash:hover {
+            background: #2ecc71;
+            transform: scale(0.98);
+        }
+        /* 禁用按钮样式（即将推出） */
+        .pay-btn-disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.7;
+            position: relative;
+        }
+        .pay-btn-disabled:hover::after {
+            content: "⚠️ Bald verfügbar";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            white-space: nowrap;
+            margin-bottom: 5px;
+            z-index: 10;
+        }
+
+        .party-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #c27e4a;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .party-price-badge {
+            background: #c27e4a;
+            color: white;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .party-day-info {
+            background: #eef3f8;
+            border-radius: 16px;
+            padding: 0.6rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #b45f2b;
+            font-size: 0.85rem;
+        }
+
+        .party-form-group {
+            margin-bottom: 1rem;
+        }
+
+        .party-form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: #5a6e7e;
+        }
+
+        .party-form-group input, .party-form-group select, .party-form-group textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #e2e9f0;
+            border-radius: 28px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .date-input-wrapper input {
+            flex: 2;
+            min-width: 120px;
+        }
+        .date-input-wrapper span {
+            color: #8a9bb0;
+            font-size: 0.85rem;
+        }
+
+        .age-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .age-group input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .age-group label {
+            display: inline-block;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .btn-party-order {
+            background: #c27e4a;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .saturday-special {
+            background: linear-gradient(135deg, #7e9eb5, #9bb7cc);
+            color: white;
+            text-align: center;
+            padding: 0.8rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #e0e8f0;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            color: #8a9bb0;
+        }
+
+        .toast-notify {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #27ae60;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            z-index: 1200;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .cart-sidebar { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast-notify" id="toastMsg">✨ Aktion erfolgreich</div>
+
+<div class="header">
+    <h1>🥢 Restaurant Mile <span style="font-size:1.8rem;">🍜</span></h1>
+    <p>Authentische asiatische Küche · Abholung & Party-Service</p>
+    <div class="nav-links">
+        <a id="navHome">Startseite</a>
+        <a id="navMenu">Speisekarte</a>
+        <a id="navParty">Party-Service</a>
+        <a id="navContact">Kontakt</a>
+    </div>
+</div>
+
+<div class="hours-banner" id="hoursBanner">
+    📍 Markgasse 16, 9450 Altstätten | ☎️ 071 755 08 88<br>
+    🕐 Di - Fr 11:00 - 14:00 · Sa 11:00 - 15:00<br>
+    🎉 Party-Service: NUR Samstag & Sonntag · ab 10 Personen · Erwachsene CHF 20.- / Kinder CHF 15.- (nur Essen) 🎉
+</div>
+
+<div class="container">
+    <div class="menu-section" id="menuSection"></div>
+    
+    <div class="cart-sidebar">
+        <div class="cart-card">
+            <div class="cart-title">
+                🛒 Warenkorb
+                <button class="clear-cart" id="clearCartBtn">Leeren</button>
+            </div>
+            <div id="cartItemsContainer" class="cart-items">
+                <div class="empty-cart" style="text-align:center; padding:1rem;">Leer</div>
+            </div>
+            <div class="cart-total" id="cartTotal">Gesamt: CHF 0,00</div>
+            
+            <div class="pickup-datetime">
+                <div class="pickup-note">
+                    💚 Wir sind sehr dankbar, wenn Sie Ihr Essen frühzeitig bestellen können. Vielen Dank für Ihre Unterstützung!
+                </div>
+                <label>⏰ Abholzeit wählen</label>
+                <select id="pickupDateTimeSelect">
+                    <option value="">-- Bitte wählen Sie eine Abholzeit --</option>
+                </select>
+                <p style="font-size:0.7rem; color:#8a9bb0; margin-top:0.3rem;">
+                    Di-Fr 11:00-14:00 · Sa 11:00-15:00 (alle 15 Minuten)
+                </p>
+            </div>
+            
+            <!-- 支付方式 - 仅保留 Barzahlung vor Ort 可用，其他为即将推出 -->
+            <div class="payment-methods">
+                <div class="payment-title">💰 Zahlungsmethode</div>
+                <div class="payment-buttons">
+                    <button class="pay-btn pay-btn-cash" id="cashPayBtn">🏪 Barzahlung vor Ort</button>
+                    <button class="pay-btn pay-btn-disabled" disabled style="background:#cbd5e1;">📱 Google Pay (bald)</button>
+                    <button class="pay-btn pay-btn-disabled" disabled style="background:#cbd5e1;">💳 Kreditkarte (bald)</button>
+                </div>
+                <p style="font-size:0.7rem; color:#8a9bb0; text-align:center; margin-top:0.5rem;">
+                    * Bezahlung erfolgt bei Abholung vor Ort
+                </p>
+            </div>
+        </div>
+        
+        <div class="party-card" id="partyServiceBox">
+            <div class="party-title">
+                🎂 Party- & Geburtstagsservice 🎉
+                <span class="party-price-badge">Erw. CHF 20.- / Kind CHF 15.-</span>
+            </div>
+            <div class="party-day-info">
+                📅 Party-Service möglich nur am:<br>
+                <strong>Samstag · Sonntag</strong><br>
+                <strong>Mindestabnahme: 10 Personen</strong><br>
+                (keine Getränke im Preis inbegriffen – nur Essen)
+            </div>
+            <p style="font-size:0.8rem; margin-bottom:0.8rem;">Für Gruppen ab 10 Personen.</p>
+            
+            <div class="party-form-group">
+                <label>👥 Personenanzahl (mindestens 10)</label>
+                <div class="age-group">
+                    <div><label>Erwachsene (CHF 20.-)</label><input type="number" id="adultCount" min="0" value="8" step="1"></div>
+                    <div><label>Kinder (CHF 15.-)</label><input type="number" id="childCount" min="0" value="2" step="1"></div>
+                </div>
+            </div>
+            <div class="party-form-group">
+                <label>📅 Wunschtermin (Nur Samstag oder Sonntag möglich!)</label>
+                <div class="date-input-wrapper">
+                    <input type="text" id="eventDate" placeholder="TT. MM. JJJJ" value="">
+                    <span>z.B. 25. 12. 2025</span>
+                </div>
+            </div>
+            
+            <div class="party-form-group">
+                <label>✏️ Besondere Wünsche (Allergien, nicht scharf, etc.)</label>
+                <textarea id="partySpecialWishes" rows="2" placeholder="z.B. Allergie gegen Erdnüsse, bitte nicht scharf, ..." style="width:100%; border-radius:20px; padding:0.6rem; border:1px solid #e2e9f0;"></textarea>
+            </div>
+            
+            <button class="btn-party-order" id="partyOrderBtn">🎊 Party-Anfrage senden 🎊</button>
+            <p style="font-size:0.7rem; text-align:center; margin-top:0.6rem;">* Getränke werden nicht angeboten – Sie können eigene Getränke mitbringen.<br>Party-Service nur Sa/So · ab 10 Personen.</p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© 2025 Restaurant Mile – Abholung & Party-Service (Sa/So, ab 10 Pers.) | Impressum</p>
+</div>
+
+<script>
+    // ========== 生成取餐时间下拉菜单 ==========
+    function generatePickupDateTimeOptions() {
+        const select = document.getElementById('pickupDateTimeSelect');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Bitte wählen Sie eine Abholzeit --</option>';
+        
+        const now = new Date();
+        const minTime = new Date(now.getTime() + 30 * 60000);
+        
+        const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+        
+        for (let i = 0; i <= 14; i++) {
+            const date = new Date();
+            date.setDate(now.getDate() + i);
+            const dayOfWeek = date.getDay();
+            
+            if (dayOfWeek >= 2 && dayOfWeek <= 6) {
+                const dateStr = date.toISOString().split('T')[0];
+                const weekdayName = weekdays[dayOfWeek];
+                const formattedDate = `${dateStr.split('-')[2]}.${dateStr.split('-')[1]}.${dateStr.split('-')[0]}`;
+                
+                let times = [];
+                if (dayOfWeek >= 2 && dayOfWeek <= 5) {
+                    for (let hour = 11; hour <= 14; hour++) {
+                        let endMinute = (hour === 14) ? 0 : 45;
+                        for (let min = 0; min <= endMinute; min += 15) {
+                            if (hour === 14 && min > 0) continue;
+                            const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                            times.push(timeStr);
+                        }
+                    }
+                } else if (dayOfWeek === 6) {
+                    for (let hour = 11; hour <= 15; hour++) {
+                        let endMinute = (hour === 15) ? 0 : 45;
+                        for (let min = 0; min <= endMinute; min += 15) {
+                            if (hour === 15 && min > 0) continue;
+                            const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                            times.push(timeStr);
+                        }
+                    }
+                }
+                
+                times.forEach(time => {
+                    const [hour, minute] = time.split(':').map(Number);
+                    const timeDate = new Date(date);
+                    timeDate.setHours(hour, minute, 0, 0);
+                    
+                    if (timeDate >= minTime) {
+                        const optionValue = `${dateStr}|${time}`;
+                        const optionText = `${formattedDate} (${weekdayName}) - ${time} Uhr`;
+                        const option = document.createElement('option');
+                        option.value = optionValue;
+                        option.textContent = optionText;
+                        select.appendChild(option);
+                    }
+                });
+            }
+        }
+        
+        if (select.children.length === 1) {
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "-- Heute keine Abholzeit mehr verfügbar --";
+            select.appendChild(option);
+        }
+    }
+    
+    // ========== MENÜDATEN ==========
+    const pouletSauceOptions = [
+        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Süß-saure Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Satay-Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Vietnamesische Soße", spice: "hot", spiceText: "🌶️ scharf" },
+        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
+    ];
+    
+    const crevettenSauceOptions = [
+        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Süß-saure Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Vietnamesische Soße", spice: "hot", spiceText: "🌶️ scharf" },
+        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
+    ];
+    
+    const rindfleischSauceOptions = [
+        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Vietnamesische Soße", spice: "hot", spiceText: "🌶️ scharf" },
+        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
+    ];
+    
+    const vegiSauceOptions = [
+        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
+        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
+    ];
+    
+    const commonExtras = ["Gebratener Reis statt gedämpft (+2.00 CHF)", "Gebratene Nudeln statt gedämpft (+2.00 CHF)"];
+
+    const menuData = {
+        "🥟 Vorspeisen": [
+            { id: 1, name: "Frühlingsrolle", price: 4.00, desc: "Knusprige Frühlingsrolle", extras: ["Süß-saure Soße (kostenlos)"] },
+            { id: 2, name: "Wantan", price: 4.00, desc: "Knusprige Wantan", extras: [] },
+            { id: 3, name: "Kartoffelsalat", price: 4.00, desc: "Asiatischer Kartoffelsalat", extras: [] }
+        ],
+        "🍛 Hauptgerichte (inkl. gedämpfter Reis)": [
+            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, extras: commonExtras },
+            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, extras: commonExtras },
+            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, extras: commonExtras },
+            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", extras: commonExtras }
+        ],
+        "🥬 Vegetarisch": [
+            { id: 8, name: "Vegetarisches Menü", price: 14.00, desc: "Saisonales Gemüse · inkl. gedämpfter Reis (ohne Aufpreis)", sauces: vegiSauceOptions, extras: [] }
+        ],
+        "🍚 Beilagen": [
+            { id: 9, name: "Gebratener Reis", price: 10.00, desc: "Mit Ei und Frühlingszwiebeln", extras: [] },
+            { id: 10, name: "Gebratene Nudeln", price: 10.00, desc: "Mit Gemüse und Sojasoße", extras: [] },
+            { id: 11, name: "Gedämpfter Reis", price: 6.00, desc: "Extra Portion gedämpfter Reis", extras: [] }
+        ],
+        "🍚🍤 Mixed-Mix Spezial": [
+            { id: 12, name: "Mixed-Mix", price: 17.00, desc: "Wähle zwei Hauptgerichte (Poulet, Rind, Crevetten) · inkl. Beilage", riceOptions: true }
+        ],
+        "⭐ Samstag Special": [
+            { id: 22, name: "Nudelsuppe mit Entenfleisch", price: 17.00, desc: "Nur Samstag!", extras: [] }
+        ],
+        "🥤 Getränke": [
+            { id: 13, name: "Coca Cola", price: 2.00, desc: "Dose 33cl", extras: [] },
+            { id: 130, name: "Coca Cola", price: 3.00, desc: "PET Flasche 500ml", extras: [] },
+            { id: 14, name: "Coca Cola Zero", price: 2.00, desc: "Dose 33cl - zuckerfrei", extras: [] },
+            { id: 140, name: "Coca Cola Zero", price: 3.00, desc: "PET Flasche 500ml - zuckerfrei", extras: [] },
+            { id: 15, name: "Fanta", price: 3.00, desc: "PET Flasche 500ml - Orangen-Geschmack", extras: [] },
+            { id: 16, name: "Rivella Rot", price: 3.00, desc: "PET Flasche 500ml - Original", extras: [] },
+            { id: 17, name: "Rivella Blau", price: 3.00, desc: "PET Flasche 500ml - weniger Zucker", extras: [] },
+            { id: 18, name: "Mango", price: 3.00, desc: "Dose 33cl - Fruchtgetränk", extras: [] },
+            { id: 19, name: "Litchi", price: 3.00, desc: "Dose 33cl - Fruchtgetränk", extras: [] },
+            { id: 20, name: "Redbull", price: 4.00, desc: "Dose 250ml - Energy Drink", extras: [] },
+            { id: 21, name: "Eistee", price: 3.00, desc: "PET Flasche 500ml", extras: ["Pfirsich", "Lemon", "Mango"] },
+            { id: 23, name: "Mineralwasser", price: 3.00, desc: "PET Flasche 500ml", extras: ["Still", "Sprudel"] },
+            { id: 24, name: "Apfelschorle", price: 3.00, desc: "PET Flasche 500ml", extras: [] },
+            { id: 25, name: "Tee", price: 4.00, desc: "Papier Tasse", extras: ["Jasmintee", "Grüner Tee"] },
+            { id: 26, name: "Kaffee", price: 4.00, desc: "Papier Tasse", extras: [] }
+        ]
+    };
+
+    let cart = [];
+    function showToast(msg) { let t=document.getElementById('toastMsg'); t.textContent=msg; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2500); }
+    function extractExtraPrice(extraName) { let m=extraName.match(/\([+\s]*([0-9,]+)\s*CHF/); return m ? parseFloat(m[1].replace(',','.')) : 0; }
+
+    function generateMenu() {
+        const menuSection = document.getElementById('menuSection');
+        if(!menuSection) return;
+        let html = `<div class="saturday-special">🎉 PARTY-SERVICE: Nur Samstag & Sonntag · ab 10 Personen · Erwachsene CHF 20.- / Kinder CHF 15.- (nur Essen) 🎉</div>`;
+        for(let [cat, items] of Object.entries(menuData)) {
+            html += `<div class="category"><h2>${cat}</h2><div class="menu-grid">`;
+            items.forEach(item => {
+                let base = item.price !== undefined ? item.price : (item.basePrice || 0);
+                html += `<div class="menu-card" data-id="${item.id}" data-base-price="${base}">
+                    <div class="menu-header"><span class="menu-name">${item.name}</span><span class="menu-price">CHF ${base.toFixed(2)}</span></div>
+                    <div class="menu-desc">${item.desc}</div>
+                    <div class="menu-extras">`;
+                
+                if(item.riceOptions) {
+                    html += `<div class="rice-group"><div class="group-title">🍚 Beilage (inklusive):</div>
+                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gedämpfter Reis" class="rice-radio"> Gedämpfter Reis</label>
+                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gebratener Reis" class="rice-radio"> Gebratener Reis</label>
+                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gebratene Nudeln" class="rice-radio"> Gebratene Nudeln</label></div>`;
+                }
+                
+                if(item.sauces && item.sauces.length) {
+                    html += `<div class="sauce-group"><div class="group-title">🍯 Sauce wählen (eine inklusive):</div>`;
+                    item.sauces.forEach(s => { 
+                        let sc = s.spice==="mild"?"spicy-mild":(s.spice==="hot"?"spicy-hot":"spicy-very");
+                        html += `<label class="extra-label"><input type="radio" name="sauce_${item.id}" data-sauce-name="${s.name}" class="sauce-radio"> ${s.name} <span class="${sc}">${s.spiceText}</span></label>`;
+                    });
+                    html += `</div>`;
+                }
+                
+                if(item.extras && item.extras.length) {
+                    item.extras.forEach((ex,idx) => { 
+                        let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
+                        html += `<label class="extra-label"><input type="${isRadio}" name="extra_${item.id}_${idx}" data-extra-name="${ex}" class="item-extra"> ${ex}</label>`;
+                    });
+                }
+                
+                html += `</div><div class="quantity-control"><button class="qty-btn minus-btn" data-id="${item.id}">-</button><span class="qty-number" id="qty-${item.id}">1</span><button class="qty-btn plus-btn" data-id="${item.id}">+</button></div>
+                <button class="add-to-cart" data-id="${item.id}">🛒 In den Warenkorb</button></div>`;
+            });
+            html += `</div></div>`;
+        }
+        menuSection.innerHTML = html;
+        attachEvents();
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.plus-btn').forEach(btn=>btn.addEventListener('click',e=>{ let id=btn.dataset.id; let span=document.getElementById(`qty-${id}`); let q=parseInt(span.innerText); if(q<99) span.innerText=q+1; }));
+        document.querySelectorAll('.minus-btn').forEach(btn=>btn.addEventListener('click',e=>{ let id=btn.dataset.id; let span=document.getElementById(`qty-${id}`); let q=parseInt(span.innerText); if(q>1) span.innerText=q-1; }));
+        document.querySelectorAll('.add-to-cart').forEach(btn=>btn.addEventListener('click',e=>{ addToCart(parseInt(btn.dataset.id)); }));
+    }
+
+    function addToCart(itemId, predefinedQty=null, forcedSauce=null, forcedRice=null, forcedExtras=[]) {
+        let found=null;
+        for(let items of Object.values(menuData)) { let f=items.find(i=>i.id===itemId); if(f){found={...f}; break;} }
+        if(!found) return;
+        let quantity = predefinedQty !== null ? predefinedQty : (document.getElementById(`qty-${itemId}`) ? parseInt(document.getElementById(`qty-${itemId}`).innerText) : 1);
+        let selectedSauce = forcedSauce || (document.querySelector(`.menu-card[data-id="${itemId}"] .sauce-radio:checked`)?.getAttribute('data-sauce-name') || "");
+        let selectedRice = forcedRice || (document.querySelector(`.menu-card[data-id="${itemId}"] .rice-radio:checked`)?.getAttribute('data-rice-name') || "");
+        let selectedExtras = [...forcedExtras];
+        let extraPriceSum=0;
+        if(!forcedExtras.length) {
+            document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ let name=inp.dataset.extraName; selectedExtras.push(name); extraPriceSum+=extractExtraPrice(name); });
+        } else {
+            forcedExtras.forEach(ex=>extraPriceSum+=extractExtraPrice(ex));
+        }
+        let itemName = found.name;
+        if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
+        if(selectedRice) itemName = `${itemName} (${selectedRice})`;
+        let basePrice = found.price !== undefined ? found.price : (found.basePrice || 0);
+        let total = (basePrice + extraPriceSum) * quantity;
+        cart.push({ id: Date.now()+Math.random(), name: itemName, quantity, extras: selectedExtras, totalPrice: total });
+        if(predefinedQty===null && document.getElementById(`qty-${itemId}`)) document.getElementById(`qty-${itemId}`).innerText="1";
+        document.querySelectorAll(`.menu-card[data-id="${itemId}"] input:checked`).forEach(i=>i.checked=false);
+        renderCart();
+        showToast(`✅ ${quantity}x ${itemName} hinzugefügt`);
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartItemsContainer');
+        const totalSpan = document.getElementById('cartTotal');
+        if(!container) return;
+        if(cart.length===0){ container.innerHTML='<div style="text-align:center; padding:1rem;">🛒 Warenkorb leer</div>'; totalSpan.innerHTML='Gesamt: CHF 0,00'; return; }
+        let html='', sum=0;
+        cart.forEach((it,idx)=>{ sum+=it.totalPrice;
+            html+=`<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${it.quantity}x ${it.name}</div>${it.extras.length?`<div class="cart-item-extras">+ ${it.extras.join(', ')}</div>`:''}</div><div class="cart-item-price">CHF ${it.totalPrice.toFixed(2)}</div><button class="remove-item" data-index="${idx}">🗑️</button></div>`;
+        });
+        container.innerHTML=html;
+        totalSpan.innerHTML=`Gesamt: CHF ${sum.toFixed(2)}`;
+        document.querySelectorAll('.remove-item').forEach(btn=>btn.addEventListener('click',e=>{ let idx=parseInt(btn.dataset.index); cart.splice(idx,1); renderCart(); }));
+    }
+
+    function parseGermanDate(dateString) {
+        if (!dateString) return null;
+        const parts = dateString.split(/[\.\s]+/);
+        if (parts.length < 3) return null;
+        let day = parseInt(parts[0]);
+        let month = parseInt(parts[1]) - 1;
+        let year = parseInt(parts[2]);
+        if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+        return new Date(year, month, day);
+    }
+
+    document.getElementById('partyOrderBtn')?.addEventListener('click', ()=>{
+        let adults = parseInt(document.getElementById('adultCount').value) || 0;
+        let children = parseInt(document.getElementById('childCount').value) || 0;
+        let totalGuests = adults + children;
+        let datumString = document.getElementById('eventDate').value.trim();
+        let specialWishes = document.getElementById('partySpecialWishes')?.value || "–";
+        
+        if(totalGuests < 10) {
+            alert("❌ Party-Service ist nur für Gruppen ab 10 Personen möglich.\n\nAktuelle Gesamtzahl: " + totalGuests + " Personen\nBitte erhöhen Sie die Anzahl auf mindestens 10.");
+            return;
+        }
+        
+        if(!datumString) {
+            alert("❌ Bitte ein Datum für Ihre Party auswählen (z.B. 25. 12. 2025) - Nur Samstag oder Sonntag!");
+            return;
+        }
+        
+        const selectedDate = parseGermanDate(datumString);
+        if (!selectedDate || isNaN(selectedDate.getTime())) {
+            alert("❌ Bitte ein gültiges Datum im Format TT. MM. JJJJ eingeben (z.B. 25. 12. 2025)");
+            return;
+        }
+        
+        const dayOfWeek = selectedDate.getDay();
+        if (dayOfWeek !== 6 && dayOfWeek !== 0) {
+            const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+            alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}\nBitte wählen Sie einen Samstag oder Sonntag.`);
+            return;
+        }
+        
+        let basePartyPrice = (adults * 20) + (children * 15);
+        let extraTotal = 0;
+        cart.forEach(i=>extraTotal+=i.totalPrice);
+        let grandTotal = basePartyPrice + extraTotal;
+        
+        const formattedDate = selectedDate.toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        let orderSummary = `🎊 PARTY-ANFRAGE (Nur Sa/So, ab 10 Pers.) 🎊\n\n`;
+        orderSummary += `Erwachsene: ${adults} à CHF 20.- = CHF ${(adults*20).toFixed(2)}\n`;
+        orderSummary += `Kinder: ${children} à CHF 15.- = CHF ${(children*15).toFixed(2)}\n`;
+        orderSummary += `Total Personen: ${totalGuests}\n`;
+        orderSummary += `Datum: ${formattedDate}\n`;
+        orderSummary += `Besondere Wünsche (Allergien, nicht scharf, etc.): ${specialWishes}\n\n`;
+        orderSummary += `📋 Bestellte Gerichte:\n`;
+        if(cart.length===0) orderSummary += `(keine Gerichte ausgewählt)\n`;
+        else cart.forEach(i=>{ orderSummary+=`${i.quantity}x ${i.name} – CHF ${i.totalPrice.toFixed(2)}\n`; });
+        orderSummary += `\n──────────────────────\n`;
+        orderSummary += `💰 Gesamt (Basis + Gerichte): CHF ${grandTotal.toFixed(2)}\n\n`;
+        orderSummary += `📌 Wichtiger Hinweis: Getränke werden im Party-Service NICHT angeboten.\n`;
+        orderSummary += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten\n☎️ 071 755 08 88\nWir kontaktieren Sie für eine verbindliche Offerte.`;
+        
+        alert(orderSummary);
+        showToast("✅ Party-Anfrage gesendet! Wir melden uns.");
+    });
+
+    // 支付功能 - 仅 Barzahlung vor Ort
+    function handleCashPayment() {
+        const pickupDateTime = document.getElementById('pickupDateTimeSelect')?.value;
+        
+        if(cart.length === 0) {
+            alert("❌ Warenkorb ist leer. Bitte fügen Sie Gerichte hinzu.");
+            return;
+        }
+        if(!pickupDateTime) {
+            alert("❌ Bitte wählen Sie eine Abholzeit aus.");
+            return;
+        }
+        
+        const [dateStr, timeStr] = pickupDateTime.split('|');
+        const formattedDate = new Date(dateStr).toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        let sum = cart.reduce((s,i)=>s+i.totalPrice,0);
+        alert(`🏪 Barzahlung vor Ort\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bar bezahlen. Vielen Dank für Ihre Bestellung!`);
+        
+        // Bestellung abschließen und Warenkorb leeren
+        cart = []; 
+        renderCart(); 
+        document.getElementById('pickupDateTimeSelect').value = "";
+        showToast("✅ Bestellung abgeschlossen! Wir freuen uns auf Ihren Besuch.");
+    }
+    
+    document.getElementById('cashPayBtn')?.addEventListener('click', handleCashPayment);
+    document.getElementById('clearCartBtn')?.addEventListener('click',()=>{ cart=[]; renderCart(); showToast("Warenkorb geleert"); });
+
+    document.getElementById('navHome')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+    document.getElementById('navMenu')?.addEventListener('click',()=>document.getElementById('menuSection')?.scrollIntoView({behavior:'smooth'}));
+    document.getElementById('navParty')?.addEventListener('click',()=>document.getElementById('partyServiceBox')?.scrollIntoView({behavior:'smooth'}));
+    document.getElementById('navContact')?.addEventListener('click',()=>document.querySelector('.footer')?.scrollIntoView({behavior:'smooth'}));
+    
+    generateMenu();
+    generatePickupDateTimeOptions();
+    renderCart();
+</script>
+</body>
+</html>
