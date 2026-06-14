@@ -446,14 +446,6 @@
             background: white;
         }
 
-        /* Flatpickr 日历样式覆盖 - 确保德语显示 */
-        .flatpickr-calendar {
-            font-family: inherit;
-        }
-        .flatpickr-monthDropdown-months, .flatpickr-year-dropdown {
-            color: #333;
-        }
-
         .datetime-wrapper {
             display: flex;
             gap: 0.8rem;
@@ -490,6 +482,25 @@
             display: inline-block;
             font-size: 0.8rem;
             margin-right: 0.5rem;
+        }
+
+        .party-contact-note {
+            background: #eef3f8;
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6a7e8e;
+        }
+        .party-contact-note a {
+            color: #c27e4a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .party-contact-note a:hover {
+            text-decoration: underline;
         }
 
         .btn-party-order {
@@ -667,6 +678,14 @@
                 <textarea id="partySpecialWishes" rows="2" placeholder="z.B. Allergie gegen Erdnüsse, bitte nicht scharf, ..." style="width:100%; border-radius:20px; padding:0.6rem; border:1px solid #e2e9f0;"></textarea>
             </div>
             
+            <!-- 提示客人直接联系餐厅 -->
+            <div class="party-contact-note">
+                📞 <strong>Individuelle Menüwünsche?</strong><br>
+                Wir erstellen gerne ein persönliches Angebot für Sie.<br>
+                Kontaktieren Sie uns direkt:<br>
+                📱 <a href="https://wa.me/41774614837">WhatsApp 077 461 48 37</a> oder ☎️ <a href="tel:0717550888">071 755 08 88</a>
+            </div>
+            
             <button class="btn-party-order" id="partyOrderBtn">🎊 Party-Anfrage senden 🎊</button>
             <p style="font-size:0.7rem; text-align:center; margin-top:0.6rem;">* Getränke werden nicht angeboten – Sie können eigene Getränke mitbringen.<br>Party-Service nur Sa/So · ab 10 Personen.</p>
         </div>
@@ -680,28 +699,25 @@
 </div>
 
 <script>
-    // ========== 初始化德语日历 (Flatpickr) ==========
+    // ========== 初始化德语日历 ==========
     function initGermanDatePicker() {
         const datePicker = document.getElementById('partyDate');
         if (!datePicker) return;
         
-        // 设置最小日期为今天
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
         flatpickr(datePicker, {
-            locale: 'de',           // 德语界面
-            dateFormat: 'd.m.Y',    // 显示格式: TT.MM.JJJJ
-            altFormat: 'j. F Y',    // 备用格式
-            minDate: today,         // 不能选过去
+            locale: 'de',
+            dateFormat: 'd.m.Y',
+            altFormat: 'j. F Y',
+            minDate: today,
             disable: [
                 function(date) {
-                    // 禁用周一至周五 (只允许周六和周日)
                     return (date.getDay() !== 6 && date.getDay() !== 0);
                 }
             ],
             onChange: function(selectedDates, dateStr, instance) {
-                // 可选: 选中日期后自动聚焦到时间选择
                 if (selectedDates.length > 0) {
                     document.getElementById('partyTime').focus();
                 }
@@ -716,19 +732,21 @@
         document.getElementById('qrcodeImage').src = qrApiUrl;
     }
     
-    // WhatsApp 餐厅号码
     const RESTAURANT_PHONE = '41774614837';
     
     function sendWhatsAppOrder(orderDetails) {
-        let message = `🍽️ *NEUE BESTELLUNG - Restaurant Mile* 🍽️%0A%0A`;
+        let message = `🍽️ *NEUE PARTY-ANFRAGE - Restaurant Mile* 🍽️%0A%0A`;
         message += `${orderDetails.items}%0A%0A`;
-        message += `💰 *Gesamt:* CHF ${orderDetails.total}%0A%0A`;
-        message += `📅 *Abholung:* ${orderDetails.pickupDate} um ${orderDetails.pickupTime} Uhr%0A%0A`;
+        if (orderDetails.total) {
+            message += `💰 *Geschätzter Gesamtbetrag:* CHF ${orderDetails.total}%0A%0A`;
+        }
+        message += `📅 *Datum:* ${orderDetails.pickupDate} um ${orderDetails.pickupTime} Uhr%0A%0A`;
         if (orderDetails.notes) {
             message += `📝 *Wünsche:* ${orderDetails.notes}%0A%0A`;
         }
-        message += `📍 Markgasse 16, 9450 Altstätten%0A`;
-        message += `☎️ 071 755 08 88`;
+        message += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten%0A`;
+        message += `☎️ 071 755 08 88%0A%0A`;
+        message += `💬 Bitte kontaktieren Sie uns für ein individuelles Angebot.`;
         
         const whatsappUrl = `https://wa.me/${RESTAURANT_PHONE}?text=${message}`;
         window.open(whatsappUrl, '_blank');
@@ -801,7 +819,7 @@
         }
     }
     
-    // ========== MENÜDATEN ==========
+    // ========== 主菜单数据 ==========
     const pouletSauceOptions = [
         { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
         { name: "Süß-saure Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
@@ -993,7 +1011,6 @@
             return;
         }
         
-        // 解析日期 (格式: DD.MM.YYYY)
         const dateParts = partyDate.split('.');
         if (dateParts.length === 3) {
             const selectedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
@@ -1021,11 +1038,12 @@
         if(cart.length===0) orderSummary += `(keine Gerichte ausgewählt)\n`;
         else cart.forEach(i=>{ orderSummary+=`${i.quantity}x ${i.name} – CHF ${i.totalPrice.toFixed(2)}\n`; });
         orderSummary += `\n──────────────────────\n`;
-        orderSummary += `💰 Gesamt (Basis + Gerichte): CHF ${grandTotal.toFixed(2)}\n\n`;
-        orderSummary += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten\n☎️ 071 755 08 88`;
+        orderSummary += `💰 Geschätzter Gesamtbetrag: CHF ${grandTotal.toFixed(2)}\n\n`;
+        orderSummary += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten\n☎️ 071 755 08 88\n\n`;
+        orderSummary += `💬 Für ein individuelles Menü kontaktieren Sie uns bitte direkt.`;
         
         alert(orderSummary);
-        showToast("✅ Party-Anfrage gesendet! Wir melden uns.");
+        showToast("✅ Party-Anfrage gesendet! Wir melden uns bei Ihnen.");
         
         sendWhatsAppOrder({
             items: orderSummary,
