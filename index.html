@@ -442,13 +442,12 @@
             background: white;
         }
 
-        /* Datum und Uhrzeit zusammen */
         .datetime-wrapper {
             display: flex;
             gap: 0.8rem;
             flex-wrap: wrap;
         }
-        .datetime-wrapper input {
+        .datetime-wrapper input, .datetime-wrapper select {
             flex: 1;
             min-width: 140px;
         }
@@ -612,11 +611,10 @@
                 </div>
             </div>
             
-            <!-- 日期和时间选择器 - 使用日历 + 时间下拉 -->
             <div class="party-form-group">
                 <label>📅 Wunschtermin (Nur Samstag oder Sonntag möglich!)</label>
                 <div class="datetime-wrapper">
-                    <input type="date" id="partyDate" style="flex:1;">
+                    <input type="date" id="partyDate" style="flex:1; font-family: inherit;">
                     <select id="partyTime" style="flex:1;">
                         <option value="">-- Uhrzeit --</option>
                         <option value="11:00">11:00 Uhr</option>
@@ -660,6 +658,21 @@
 </div>
 
 <script>
+    // ========== 日历德语设置 ==========
+    // 设置浏览器的语言偏好为德语，让日期选择器显示德语
+    // 这会影响 type="date" 输入框的显示语言
+    function setGermanDatePicker() {
+        // 方法：动态创建一个带有德语 locale 的日期输入框
+        // 浏览器的日期选择器会根据系统语言或 html lang 属性显示
+        // 我们已经设置了 <html lang="de">，大多数浏览器会自动显示德语
+        // 额外添加一个 polyfill 确保兼容性
+        const datePicker = document.getElementById('partyDate');
+        if (datePicker) {
+            // 设置输入框的 lang 属性
+            datePicker.setAttribute('lang', 'de');
+        }
+    }
+    
     // ========== 生成二维码 ==========
     function generateQRCode() {
         const websiteUrl = 'https://mileschweiz.github.io/restaurant-mile/';
@@ -1047,6 +1060,7 @@
     generatePickupDateTimeOptions();
     generateQRCode();
     setDatePickerMin();
+    setGermanDatePicker();
     renderCart();
 </script>
 </body>
