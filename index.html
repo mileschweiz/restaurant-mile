@@ -357,7 +357,6 @@
             background: #2ecc71;
             transform: scale(0.98);
         }
-        /* 禁用按钮样式（即将推出） */
         .pay-btn-disabled {
             background: #cbd5e1;
             color: #94a3b8;
@@ -564,7 +563,6 @@
                 </p>
             </div>
             
-            <!-- 支付方式 - 仅保留 Barzahlung vor Ort 可用，其他为即将推出 -->
             <div class="payment-methods">
                 <div class="payment-title">💰 Zahlungsmethode</div>
                 <div class="payment-buttons">
@@ -622,6 +620,27 @@
 </div>
 
 <script>
+    // WhatsApp 餐厅号码（瑞士）
+    const RESTAURANT_PHONE = '41774614837';  // 0041774614837 -> 41774614837
+    
+    // 发送 WhatsApp 订单通知
+    function sendWhatsAppOrder(orderDetails) {
+        // 构建消息内容
+        let message = `🍽️ *NEUE BESTELLUNG - Restaurant Mile* 🍽️%0A%0A`;
+        message += `${orderDetails.items}%0A%0A`;
+        message += `💰 *Gesamt:* CHF ${orderDetails.total}%0A%0A`;
+        message += `📅 *Abholung:* ${orderDetails.pickupDate} um ${orderDetails.pickupTime} Uhr%0A%0A`;
+        if (orderDetails.notes) {
+            message += `📝 *Wünsche:* ${orderDetails.notes}%0A%0A`;
+        }
+        message += `📍 Markgasse 16, 9450 Altstätten%0A`;
+        message += `☎️ 071 755 08 88`;
+        
+        // WhatsApp URL 编码后打开
+        const whatsappUrl = `https://wa.me/${RESTAURANT_PHONE}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+    }
+    
     // ========== 生成取餐时间下拉菜单 ==========
     function generatePickupDateTimeOptions() {
         const select = document.getElementById('pickupDateTimeSelect');
@@ -912,20 +931,28 @@
         orderSummary += `Kinder: ${children} à CHF 15.- = CHF ${(children*15).toFixed(2)}\n`;
         orderSummary += `Total Personen: ${totalGuests}\n`;
         orderSummary += `Datum: ${formattedDate}\n`;
-        orderSummary += `Besondere Wünsche (Allergien, nicht scharf, etc.): ${specialWishes}\n\n`;
+        orderSummary += `Besondere Wünsche: ${specialWishes}\n\n`;
         orderSummary += `📋 Bestellte Gerichte:\n`;
         if(cart.length===0) orderSummary += `(keine Gerichte ausgewählt)\n`;
         else cart.forEach(i=>{ orderSummary+=`${i.quantity}x ${i.name} – CHF ${i.totalPrice.toFixed(2)}\n`; });
         orderSummary += `\n──────────────────────\n`;
         orderSummary += `💰 Gesamt (Basis + Gerichte): CHF ${grandTotal.toFixed(2)}\n\n`;
-        orderSummary += `📌 Wichtiger Hinweis: Getränke werden im Party-Service NICHT angeboten.\n`;
-        orderSummary += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten\n☎️ 071 755 08 88\nWir kontaktieren Sie für eine verbindliche Offerte.`;
+        orderSummary += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten\n☎️ 071 755 08 88`;
         
         alert(orderSummary);
         showToast("✅ Party-Anfrage gesendet! Wir melden uns.");
+        
+        // 发送 WhatsApp 通知
+        sendWhatsAppOrder({
+            items: orderSummary,
+            total: grandTotal.toFixed(2),
+            pickupDate: formattedDate,
+            pickupTime: "",
+            notes: specialWishes
+        });
     });
 
-    // 支付功能 - 仅 Barzahlung vor Ort
+    // 支付功能 - Barzahlung vor Ort + WhatsApp 通知
     function handleCashPayment() {
         const pickupDateTime = document.getElementById('pickupDateTimeSelect')?.value;
         
@@ -942,9 +969,32 @@
         const formattedDate = new Date(dateStr).toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         
         let sum = cart.reduce((s,i)=>s+i.totalPrice,0);
+        
+        // 构建订单详情文本
+        let itemsText = "";
+        cart.forEach(item => {
+            itemsText += `${item.quantity}x ${item.name} – CHF ${item.totalPrice.toFixed(2)}\n`;
+        });
+        
+        const orderMessage = `🆕 *NEUE BESTELLUNG* 🆕\n\n` +
+            `📋 *Bestellung:*\n${itemsText}\n` +
+            `💰 *Total:* CHF ${sum.toFixed(2)}\n\n` +
+            `📅 *Abholung:* ${formattedDate} um ${timeStr} Uhr\n\n` +
+            `🏪 *Zahlung:* Barzahlung vor Ort`;
+        
+        // 显示客人确认弹窗
         alert(`🏪 Barzahlung vor Ort\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bar bezahlen. Vielen Dank für Ihre Bestellung!`);
         
-        // Bestellung abschließen und Warenkorb leeren
+        // 发送 WhatsApp 通知给餐厅
+        sendWhatsAppOrder({
+            items: itemsText,
+            total: sum.toFixed(2),
+            pickupDate: formattedDate,
+            pickupTime: timeStr,
+            notes: ""
+        });
+        
+        // 清空购物车
         cart = []; 
         renderCart(); 
         document.getElementById('pickupDateTimeSelect').value = "";
