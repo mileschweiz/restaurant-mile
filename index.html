@@ -613,12 +613,15 @@
             <div class="payment-methods">
                 <div class="payment-title">💰 Zahlungsmethode</div>
                 <div class="payment-buttons">
-                    <button class="pay-btn pay-btn-cash" id="cashPayBtn">🏪 Barzahlung vor Ort</button>
+                    <button class="pay-btn pay-btn-cash" id="cashPayBtn">🏪 Bezahlung vor Ort</button>
                     <button class="pay-btn pay-btn-disabled" disabled style="background:#cbd5e1;">📱 Google Pay (bald)</button>
                     <button class="pay-btn pay-btn-disabled" disabled style="background:#cbd5e1;">💳 Kreditkarte (bald)</button>
                 </div>
                 <p style="font-size:0.7rem; color:#8a9bb0; text-align:center; margin-top:0.5rem;">
-                    * Bezahlung erfolgt bei Abholung vor Ort
+                    * Bezahlung vor Ort: Bar oder Karte (Visa/Mastercard)
+                </p>
+                <p style="font-size:0.65rem; color:#8a9bb0; text-align:center; margin-top:0.3rem;">
+                    💡 Falls WhatsApp nicht öffnet, bitte zweimal klicken.
                 </p>
             </div>
         </div>
@@ -678,7 +681,6 @@
                 <textarea id="partySpecialWishes" rows="2" placeholder="z.B. Allergie gegen Erdnüsse, bitte nicht scharf, ..." style="width:100%; border-radius:20px; padding:0.6rem; border:1px solid #e2e9f0;"></textarea>
             </div>
             
-            <!-- 提示客人直接联系餐厅 -->
             <div class="party-contact-note">
                 📞 <strong>Individuelle Menüwünsche?</strong><br>
                 Wir erstellen gerne ein persönliches Angebot für Sie.<br>
@@ -735,21 +737,21 @@
     const RESTAURANT_PHONE = '41774614837';
     
     function sendWhatsAppOrder(orderDetails) {
-        let message = `🍽️ *NEUE PARTY-ANFRAGE - Restaurant Mile* 🍽️%0A%0A`;
+        let message = `🍽️ *NEUE BESTELLUNG - Restaurant Mile* 🍽️%0A%0A`;
         message += `${orderDetails.items}%0A%0A`;
         if (orderDetails.total) {
-            message += `💰 *Geschätzter Gesamtbetrag:* CHF ${orderDetails.total}%0A%0A`;
+            message += `💰 *Gesamtbetrag:* CHF ${orderDetails.total}%0A%0A`;
         }
-        message += `📅 *Datum:* ${orderDetails.pickupDate} um ${orderDetails.pickupTime} Uhr%0A%0A`;
+        message += `📅 *Abholung:* ${orderDetails.pickupDate} um ${orderDetails.pickupTime} Uhr%0A%0A`;
         if (orderDetails.notes) {
             message += `📝 *Wünsche:* ${orderDetails.notes}%0A%0A`;
         }
         message += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten%0A`;
-        message += `☎️ 071 755 08 88%0A%0A`;
-        message += `💬 Bitte kontaktieren Sie uns für ein individuelles Angebot.`;
+        message += `☎️ 071 755 08 88`;
         
         const whatsappUrl = `https://wa.me/${RESTAURANT_PHONE}?text=${message}`;
-        window.open(whatsappUrl, '_blank');
+        // 改用 location.href 避免第一次点击被浏览器拦截
+        window.location.href = whatsappUrl;
     }
     
     // ========== 生成取餐时间下拉菜单 ==========
@@ -1076,7 +1078,7 @@
             itemsText += `${item.quantity}x ${item.name} – CHF ${item.totalPrice.toFixed(2)}\n`;
         });
         
-        alert(`🏪 Barzahlung vor Ort\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bar bezahlen.`);
+        alert(`🏪 Bezahlung vor Ort (Bar oder Karte)\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bezahlen. Vielen Dank!`);
         
         sendWhatsAppOrder({
             items: itemsText,
