@@ -221,7 +221,6 @@
             align-self: flex-start;
         }
 
-        /* 二维码独立卡片 - 在 Warenkorb 外面，侧边栏顶部 */
         .qrcode-card {
             background: #fef8f0;
             border-radius: 24px;
@@ -390,22 +389,6 @@
             color: #94a3b8;
             cursor: not-allowed;
             opacity: 0.7;
-            position: relative;
-        }
-        .pay-btn-disabled:hover::after {
-            content: "⚠️ Bald verfügbar";
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 8px;
-            white-space: nowrap;
-            margin-bottom: 5px;
-            z-index: 10;
         }
 
         .party-title {
@@ -459,19 +442,15 @@
             background: white;
         }
 
-        .date-input-wrapper {
+        /* Datum und Uhrzeit zusammen */
+        .datetime-wrapper {
             display: flex;
-            gap: 0.5rem;
-            align-items: center;
+            gap: 0.8rem;
             flex-wrap: wrap;
         }
-        .date-input-wrapper input {
-            flex: 2;
-            min-width: 120px;
-        }
-        .date-input-wrapper span {
-            color: #8a9bb0;
-            font-size: 0.85rem;
+        .datetime-wrapper input {
+            flex: 1;
+            min-width: 140px;
         }
 
         .age-group {
@@ -540,6 +519,7 @@
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .cart-sidebar { position: static; }
+            .datetime-wrapper { flex-direction: column; }
         }
     </style>
 </head>
@@ -568,11 +548,10 @@
     <div class="menu-section" id="menuSection"></div>
     
     <div class="cart-sidebar">
-        <!-- 二维码独立卡片 - 在 Warenkorb 外面，侧边栏最顶部 -->
         <div class="qrcode-card">
-               <h4>📱 WhatsApp Bestellung</h4>
-               <img id="qrcodeImage" src="" alt="QR Code">
-               <p>Bequem per WhatsApp bestellen – Einfach scannen und loslegen!</p>
+            <h4>📱 WhatsApp Bestellung</h4>
+            <img id="qrcodeImage" src="" alt="QR Code">
+            <p>Bequem per WhatsApp bestellen – Einfach scannen und loslegen!</p>
         </div>
         
         <div class="cart-card">
@@ -632,11 +611,34 @@
                     <div><label>Kinder (CHF 15.-)</label><input type="number" id="childCount" min="0" value="2" step="1"></div>
                 </div>
             </div>
+            
+            <!-- 日期和时间选择器 - 使用日历 + 时间下拉 -->
             <div class="party-form-group">
                 <label>📅 Wunschtermin (Nur Samstag oder Sonntag möglich!)</label>
-                <div class="date-input-wrapper">
-                    <input type="text" id="eventDate" placeholder="TT. MM. JJJJ" value="">
-                    <span>z.B. 25. 12. 2025</span>
+                <div class="datetime-wrapper">
+                    <input type="date" id="partyDate" style="flex:1;">
+                    <select id="partyTime" style="flex:1;">
+                        <option value="">-- Uhrzeit --</option>
+                        <option value="11:00">11:00 Uhr</option>
+                        <option value="11:30">11:30 Uhr</option>
+                        <option value="12:00">12:00 Uhr</option>
+                        <option value="12:30">12:30 Uhr</option>
+                        <option value="13:00">13:00 Uhr</option>
+                        <option value="13:30">13:30 Uhr</option>
+                        <option value="14:00">14:00 Uhr</option>
+                        <option value="14:30">14:30 Uhr</option>
+                        <option value="15:00">15:00 Uhr</option>
+                        <option value="15:30">15:30 Uhr</option>
+                        <option value="16:00">16:00 Uhr</option>
+                        <option value="16:30">16:30 Uhr</option>
+                        <option value="17:00">17:00 Uhr</option>
+                        <option value="17:30">17:30 Uhr</option>
+                        <option value="18:00">18:00 Uhr</option>
+                        <option value="18:30">18:30 Uhr</option>
+                        <option value="19:00">19:00 Uhr</option>
+                        <option value="19:30">19:30 Uhr</option>
+                        <option value="20:00">20:00 Uhr</option>
+                    </select>
                 </div>
             </div>
             
@@ -658,17 +660,28 @@
 </div>
 
 <script>
-    // ========== 生成二维码（使用免费API） ==========
+    // ========== 生成二维码 ==========
     function generateQRCode() {
         const websiteUrl = 'https://mileschweiz.github.io/restaurant-mile/';
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(websiteUrl)}`;
         document.getElementById('qrcodeImage').src = qrApiUrl;
     }
     
-    // WhatsApp 餐厅号码（瑞士）
-    const RESTAURANT_PHONE = '41774614837';  // 0041774614837 -> 41774614837
+    // ========== 设置日期选择器的最小日期 ==========
+    function setDatePickerMin() {
+        const datePicker = document.getElementById('partyDate');
+        if (!datePicker) return;
+        
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        datePicker.min = `${yyyy}-${mm}-${dd}`;
+    }
     
-    // 发送 WhatsApp 订单通知
+    // WhatsApp 餐厅号码
+    const RESTAURANT_PHONE = '41774614837';
+    
     function sendWhatsAppOrder(orderDetails) {
         let message = `🍽️ *NEUE BESTELLUNG - Restaurant Mile* 🍽️%0A%0A`;
         message += `${orderDetails.items}%0A%0A`;
@@ -693,7 +706,6 @@
         
         const now = new Date();
         const minTime = new Date(now.getTime() + 30 * 60000);
-        
         const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
         
         for (let i = 0; i <= 14; i++) {
@@ -921,44 +933,34 @@
         document.querySelectorAll('.remove-item').forEach(btn=>btn.addEventListener('click',e=>{ let idx=parseInt(btn.dataset.index); cart.splice(idx,1); renderCart(); }));
     }
 
-    function parseGermanDate(dateString) {
-        if (!dateString) return null;
-        const parts = dateString.split(/[\.\s]+/);
-        if (parts.length < 3) return null;
-        let day = parseInt(parts[0]);
-        let month = parseInt(parts[1]) - 1;
-        let year = parseInt(parts[2]);
-        if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
-        return new Date(year, month, day);
-    }
-
     document.getElementById('partyOrderBtn')?.addEventListener('click', ()=>{
         let adults = parseInt(document.getElementById('adultCount').value) || 0;
         let children = parseInt(document.getElementById('childCount').value) || 0;
         let totalGuests = adults + children;
-        let datumString = document.getElementById('eventDate').value.trim();
+        let partyDate = document.getElementById('partyDate').value;
+        let partyTime = document.getElementById('partyTime').value;
         let specialWishes = document.getElementById('partySpecialWishes')?.value || "–";
         
         if(totalGuests < 10) {
-            alert("❌ Party-Service ist nur für Gruppen ab 10 Personen möglich.\n\nAktuelle Gesamtzahl: " + totalGuests + " Personen\nBitte erhöhen Sie die Anzahl auf mindestens 10.");
+            alert("❌ Party-Service ist nur für Gruppen ab 10 Personen möglich.\n\nAktuelle Gesamtzahl: " + totalGuests + " Personen");
             return;
         }
         
-        if(!datumString) {
-            alert("❌ Bitte ein Datum für Ihre Party auswählen (z.B. 25. 12. 2025) - Nur Samstag oder Sonntag!");
+        if(!partyDate) {
+            alert("❌ Bitte wählen Sie ein Datum für Ihre Party aus.");
             return;
         }
         
-        const selectedDate = parseGermanDate(datumString);
-        if (!selectedDate || isNaN(selectedDate.getTime())) {
-            alert("❌ Bitte ein gültiges Datum im Format TT. MM. JJJJ eingeben (z.B. 25. 12. 2025)");
+        if(!partyTime) {
+            alert("❌ Bitte wählen Sie eine Uhrzeit für Ihre Party aus.");
             return;
         }
         
+        const selectedDate = new Date(partyDate);
         const dayOfWeek = selectedDate.getDay();
         if (dayOfWeek !== 6 && dayOfWeek !== 0) {
             const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-            alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}\nBitte wählen Sie einen Samstag oder Sonntag.`);
+            alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}`);
             return;
         }
         
@@ -974,6 +976,7 @@
         orderSummary += `Kinder: ${children} à CHF 15.- = CHF ${(children*15).toFixed(2)}\n`;
         orderSummary += `Total Personen: ${totalGuests}\n`;
         orderSummary += `Datum: ${formattedDate}\n`;
+        orderSummary += `Uhrzeit: ${partyTime} Uhr\n`;
         orderSummary += `Besondere Wünsche: ${specialWishes}\n\n`;
         orderSummary += `📋 Bestellte Gerichte:\n`;
         if(cart.length===0) orderSummary += `(keine Gerichte ausgewählt)\n`;
@@ -989,7 +992,7 @@
             items: orderSummary,
             total: grandTotal.toFixed(2),
             pickupDate: formattedDate,
-            pickupTime: "",
+            pickupTime: partyTime,
             notes: specialWishes
         });
     });
@@ -1016,7 +1019,7 @@
             itemsText += `${item.quantity}x ${item.name} – CHF ${item.totalPrice.toFixed(2)}\n`;
         });
         
-        alert(`🏪 Barzahlung vor Ort\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bar bezahlen. Vielen Dank für Ihre Bestellung!`);
+        alert(`🏪 Barzahlung vor Ort\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bar bezahlen.`);
         
         sendWhatsAppOrder({
             items: itemsText,
@@ -1043,6 +1046,7 @@
     generateMenu();
     generatePickupDateTimeOptions();
     generateQRCode();
+    setDatePickerMin();
     renderCart();
 </script>
 </body>
