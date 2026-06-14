@@ -613,7 +613,7 @@
             <div class="payment-methods">
                 <div class="payment-title">💰 Zahlungsmethode</div>
                 <div class="payment-buttons">
-                    <button class="pay-btn pay-btn-cash" id="cashPayBtn">🏪 Bezahlung vor Ort</button>
+                    <button class="pay-btn pay-btn-cash" id="cashPayBtn">🏪 Jetzt bestellen (Bezahlung vor Ort)</button>
                     <button class="pay-btn pay-btn-disabled" disabled style="background:#cbd5e1;">📱 Google Pay (bald)</button>
                     <button class="pay-btn pay-btn-disabled" disabled style="background:#cbd5e1;">💳 Kreditkarte (bald)</button>
                 </div>
@@ -750,7 +750,6 @@
         message += `☎️ 071 755 08 88`;
         
         const whatsappUrl = `https://wa.me/${RESTAURANT_PHONE}?text=${message}`;
-        // 改用 location.href 避免第一次点击被浏览器拦截
         window.location.href = whatsappUrl;
     }
     
