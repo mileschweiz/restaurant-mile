@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Restaurant Mile | Abholung & Party-Service</title>
+    <!-- Flatpickr 德语日历 CSS 和 JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
     <style>
         * {
             margin: 0;
@@ -442,12 +446,30 @@
             background: white;
         }
 
+        /* Flatpickr 日历样式覆盖 - 确保德语显示 */
+        .flatpickr-calendar {
+            font-family: inherit;
+        }
+        .flatpickr-monthDropdown-months, .flatpickr-year-dropdown {
+            color: #333;
+        }
+
         .datetime-wrapper {
             display: flex;
             gap: 0.8rem;
             flex-wrap: wrap;
         }
-        .datetime-wrapper input, .datetime-wrapper select {
+        .datetime-wrapper .party-date-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 0.7rem 1rem;
+            border: 1px solid #e2e9f0;
+            border-radius: 28px;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+        .datetime-wrapper select {
             flex: 1;
             min-width: 140px;
         }
@@ -614,8 +636,8 @@
             <div class="party-form-group">
                 <label>📅 Wunschtermin (Nur Samstag oder Sonntag möglich!)</label>
                 <div class="datetime-wrapper">
-                    <input type="date" id="partyDate" style="flex:1; font-family: inherit;">
-                    <select id="partyTime" style="flex:1;">
+                    <input type="text" id="partyDate" class="party-date-input" placeholder="Datum auswählen" readonly>
+                    <select id="partyTime">
                         <option value="">-- Uhrzeit --</option>
                         <option value="11:00">11:00 Uhr</option>
                         <option value="11:30">11:30 Uhr</option>
@@ -658,19 +680,33 @@
 </div>
 
 <script>
-    // ========== 日历德语设置 ==========
-    // 设置浏览器的语言偏好为德语，让日期选择器显示德语
-    // 这会影响 type="date" 输入框的显示语言
-    function setGermanDatePicker() {
-        // 方法：动态创建一个带有德语 locale 的日期输入框
-        // 浏览器的日期选择器会根据系统语言或 html lang 属性显示
-        // 我们已经设置了 <html lang="de">，大多数浏览器会自动显示德语
-        // 额外添加一个 polyfill 确保兼容性
+    // ========== 初始化德语日历 (Flatpickr) ==========
+    function initGermanDatePicker() {
         const datePicker = document.getElementById('partyDate');
-        if (datePicker) {
-            // 设置输入框的 lang 属性
-            datePicker.setAttribute('lang', 'de');
-        }
+        if (!datePicker) return;
+        
+        // 设置最小日期为今天
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        flatpickr(datePicker, {
+            locale: 'de',           // 德语界面
+            dateFormat: 'd.m.Y',    // 显示格式: TT.MM.JJJJ
+            altFormat: 'j. F Y',    // 备用格式
+            minDate: today,         // 不能选过去
+            disable: [
+                function(date) {
+                    // 禁用周一至周五 (只允许周六和周日)
+                    return (date.getDay() !== 6 && date.getDay() !== 0);
+                }
+            ],
+            onChange: function(selectedDates, dateStr, instance) {
+                // 可选: 选中日期后自动聚焦到时间选择
+                if (selectedDates.length > 0) {
+                    document.getElementById('partyTime').focus();
+                }
+            }
+        });
     }
     
     // ========== 生成二维码 ==========
@@ -678,18 +714,6 @@
         const websiteUrl = 'https://mileschweiz.github.io/restaurant-mile/';
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(websiteUrl)}`;
         document.getElementById('qrcodeImage').src = qrApiUrl;
-    }
-    
-    // ========== 设置日期选择器的最小日期 ==========
-    function setDatePickerMin() {
-        const datePicker = document.getElementById('partyDate');
-        if (!datePicker) return;
-        
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        datePicker.min = `${yyyy}-${mm}-${dd}`;
     }
     
     // WhatsApp 餐厅号码
@@ -969,12 +993,16 @@
             return;
         }
         
-        const selectedDate = new Date(partyDate);
-        const dayOfWeek = selectedDate.getDay();
-        if (dayOfWeek !== 6 && dayOfWeek !== 0) {
-            const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-            alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}`);
-            return;
+        // 解析日期 (格式: DD.MM.YYYY)
+        const dateParts = partyDate.split('.');
+        if (dateParts.length === 3) {
+            const selectedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+            const dayOfWeek = selectedDate.getDay();
+            if (dayOfWeek !== 6 && dayOfWeek !== 0) {
+                const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+                alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}`);
+                return;
+            }
         }
         
         let basePartyPrice = (adults * 20) + (children * 15);
@@ -982,13 +1010,11 @@
         cart.forEach(i=>extraTotal+=i.totalPrice);
         let grandTotal = basePartyPrice + extraTotal;
         
-        const formattedDate = selectedDate.toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        
         let orderSummary = `🎊 PARTY-ANFRAGE (Nur Sa/So, ab 10 Pers.) 🎊\n\n`;
         orderSummary += `Erwachsene: ${adults} à CHF 20.- = CHF ${(adults*20).toFixed(2)}\n`;
         orderSummary += `Kinder: ${children} à CHF 15.- = CHF ${(children*15).toFixed(2)}\n`;
         orderSummary += `Total Personen: ${totalGuests}\n`;
-        orderSummary += `Datum: ${formattedDate}\n`;
+        orderSummary += `Datum: ${partyDate}\n`;
         orderSummary += `Uhrzeit: ${partyTime} Uhr\n`;
         orderSummary += `Besondere Wünsche: ${specialWishes}\n\n`;
         orderSummary += `📋 Bestellte Gerichte:\n`;
@@ -1004,7 +1030,7 @@
         sendWhatsAppOrder({
             items: orderSummary,
             total: grandTotal.toFixed(2),
-            pickupDate: formattedDate,
+            pickupDate: partyDate,
             pickupTime: partyTime,
             notes: specialWishes
         });
@@ -1059,8 +1085,7 @@
     generateMenu();
     generatePickupDateTimeOptions();
     generateQRCode();
-    setDatePickerMin();
-    setGermanDatePicker();
+    initGermanDatePicker();
     renderCart();
 </script>
 </body>
