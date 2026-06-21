@@ -548,10 +548,63 @@
             pointer-events: none;
         }
 
+        /* ===== Bildergalerie Styles ===== */
+        .gallery-section {
+            margin: 2rem auto 1rem auto;
+            max-width: 1400px;
+            padding: 0 1rem;
+        }
+        .gallery-section h2 {
+            font-size: 1.8rem;
+            border-left: 4px solid #b0c4d8;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+            color: #5a6e7e;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.2rem;
+        }
+        .gallery-item {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: #fcf8f4;
+            border: 1px solid #e8eef3;
+        }
+        .gallery-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+        }
+        .gallery-item img {
+            display: block;
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        .gallery-item .caption {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+            color: #5a6e7e;
+            background: white;
+            text-align: center;
+            border-top: 1px solid #ecf0f5;
+            font-weight: 500;
+        }
+
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .cart-sidebar { position: static; }
             .datetime-wrapper { flex-direction: column; }
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .gallery-item img { height: 150px; }
+        }
+        @media (max-width: 480px) {
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .gallery-item img { height: 120px; }
         }
     </style>
 </head>
@@ -565,6 +618,7 @@
     <div class="nav-links">
         <a id="navHome">Startseite</a>
         <a id="navMenu">Speisekarte</a>
+        <a id="navGallery">Bildergalerie</a>
         <a id="navParty">Party-Service</a>
         <a id="navContact">Kontakt</a>
     </div>
@@ -574,6 +628,14 @@
     📍 Markgasse 16, 9450 Altstätten | ☎️ 071 755 08 88<br>
     🕐 Di - Fr 11:00 - 14:00 · Sa 11:00 - 15:00<br>
     🎉 Party-Service: NUR Samstag & Sonntag · ab 10 Personen · Erwachsene CHF 20.- / Kinder CHF 15.- (nur Essen) 🎉
+</div>
+
+<!-- ===== BILDERGALERIE ===== -->
+<div class="gallery-section" id="gallerySection">
+    <h2>📸 Bildergalerie – Unsere Spezialitäten & Restaurant</h2>
+    <div class="gallery-grid" id="galleryGrid">
+        <!-- 图片通过 JavaScript 动态生成 -->
+    </div>
 </div>
 
 <div class="container">
@@ -701,6 +763,36 @@
 </div>
 
 <script>
+    // ========== 图片画廊数据 ==========
+    // 在这里添加或替换您的图片链接和标题
+    const galleryImages = [
+        { src: "https://via.placeholder.com/400x300/7e9eb5/ffffff?text=Frühlingsrolle", caption: "🥟 Knusprige Frühlingsrolle" },
+        { src: "https://via.placeholder.com/400x300/9bb7cc/ffffff?text=Poulet+Curry", caption: "🍛 Poulet mit Malaysia-Curry" },
+        { src: "https://via.placeholder.com/400x300/c27e4a/ffffff?text=Party+Service", caption: "🎉 Party-Service für Gruppen" },
+        { src: "https://via.placeholder.com/400x300/8aacbf/ffffff?text=Restaurant", caption: "🏠 Unser Restaurant" },
+        { src: "https://via.placeholder.com/400x300/27ae60/ffffff?text=Frische+Zutaten", caption: "🥬 Frische Zutaten" },
+        { src: "https://via.placeholder.com/400x300/e67e22/ffffff?text=Getränke", caption: "🥤 Erfrischende Getränke" },
+        { src: "https://via.placeholder.com/400x300/6c8b9f/ffffff?text=Ente+Knusprig", caption: "🦆 Knusprige Ente" },
+        { src: "https://via.placeholder.com/400x300/b8a99a/ffffff?text=Vegetarisch", caption: "🥗 Vegetarische Vielfalt" }
+    ];
+
+    // ========== 渲染图片画廊 ==========
+    function renderGallery() {
+        const grid = document.getElementById('galleryGrid');
+        if (!grid) return;
+        
+        let html = '';
+        galleryImages.forEach(img => {
+            html += `
+                <div class="gallery-item">
+                    <img src="${img.src}" alt="${img.caption}" loading="lazy">
+                    <div class="caption">${img.caption}</div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
     // ========== 初始化德语日历 ==========
     function initGermanDatePicker() {
         const datePicker = document.getElementById('partyDate');
@@ -824,288 +916,4 @@
     const pouletSauceOptions = [
         { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
         { name: "Süß-saure Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
-        { name: "Satay-Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
-        { name: "Vietnamesische Soße", spice: "hot", spiceText: "🌶️ scharf" },
-        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
-    ];
-    
-    const crevettenSauceOptions = [
-        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
-        { name: "Süß-saure Soße", spice: "mild", spiceText: "🌶️ nicht scharf" },
-        { name: "Vietnamesische Soße", spice: "hot", spiceText: "🌶️ scharf" },
-        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
-    ];
-    
-    const rindfleischSauceOptions = [
-        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
-        { name: "Vietnamesische Soße", spice: "hot", spiceText: "🌶️ scharf" },
-        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
-    ];
-    
-    const vegiSauceOptions = [
-        { name: "Malaysische Currysoße", spice: "mild", spiceText: "🌶️ nicht scharf" },
-        { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
-    ];
-    
-    const commonExtras = ["Gebratener Reis statt gedämpft (+2.00 CHF)", "Gebratene Nudeln statt gedämpft (+2.00 CHF)"];
-
-    const menuData = {
-        "🥟 Vorspeisen": [
-            { id: 1, name: "Frühlingsrolle", price: 4.00, desc: "Knusprige Frühlingsrolle", extras: ["Süß-saure Soße (kostenlos)"] },
-            { id: 2, name: "Wantan", price: 4.00, desc: "Knusprige Wantan", extras: [] },
-            { id: 3, name: "Kartoffelsalat", price: 4.00, desc: "Asiatischer Kartoffelsalat", extras: [] }
-        ],
-        "🍛 Hauptgerichte (inkl. gedämpfter Reis)": [
-            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, extras: commonExtras },
-            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, extras: commonExtras },
-            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, extras: commonExtras },
-            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", extras: commonExtras }
-        ],
-        "🥬 Vegetarisch": [
-            { id: 8, name: "Vegetarisches Menü", price: 14.00, desc: "Saisonales Gemüse · inkl. gedämpfter Reis (ohne Aufpreis)", sauces: vegiSauceOptions, extras: [] }
-        ],
-        "🍚 Beilagen": [
-            { id: 9, name: "Gebratener Reis", price: 10.00, desc: "Mit Ei und Frühlingszwiebeln", extras: [] },
-            { id: 10, name: "Gebratene Nudeln", price: 10.00, desc: "Mit Gemüse und Sojasoße", extras: [] },
-            { id: 11, name: "Gedämpfter Reis", price: 6.00, desc: "Extra Portion gedämpfter Reis", extras: [] }
-        ],
-        "🍚🍤 Mixed-Mix Spezial": [
-            { id: 12, name: "Mixed-Mix", price: 17.00, desc: "Wähle zwei Hauptgerichte (Poulet, Rind, Crevetten) · inkl. Beilage", riceOptions: true }
-        ],
-        "⭐ Samstag Special": [
-            { id: 22, name: "Nudelsuppe mit Entenfleisch", price: 17.00, desc: "Nur Samstag!", extras: [] }
-        ],
-        "🥤 Getränke": [
-            { id: 13, name: "Coca Cola", price: 2.00, desc: "Dose 33cl", extras: [] },
-            { id: 130, name: "Coca Cola", price: 3.00, desc: "PET Flasche 500ml", extras: [] },
-            { id: 14, name: "Coca Cola Zero", price: 2.00, desc: "Dose 33cl - zuckerfrei", extras: [] },
-            { id: 140, name: "Coca Cola Zero", price: 3.00, desc: "PET Flasche 500ml - zuckerfrei", extras: [] },
-            { id: 15, name: "Fanta", price: 3.00, desc: "PET Flasche 500ml - Orangen-Geschmack", extras: [] },
-            { id: 16, name: "Rivella Rot", price: 3.00, desc: "PET Flasche 500ml - Original", extras: [] },
-            { id: 17, name: "Rivella Blau", price: 3.00, desc: "PET Flasche 500ml - weniger Zucker", extras: [] },
-            { id: 18, name: "Mango", price: 3.00, desc: "Dose 33cl - Fruchtgetränk", extras: [] },
-            { id: 19, name: "Litchi", price: 3.00, desc: "Dose 33cl - Fruchtgetränk", extras: [] },
-            { id: 20, name: "Redbull", price: 4.00, desc: "Dose 250ml - Energy Drink", extras: [] },
-            { id: 21, name: "Eistee", price: 3.00, desc: "PET Flasche 500ml", extras: ["Pfirsich", "Lemon", "Mango"] },
-            { id: 23, name: "Mineralwasser", price: 3.00, desc: "PET Flasche 500ml", extras: ["Still", "Sprudel"] },
-            { id: 24, name: "Apfelschorle", price: 3.00, desc: "PET Flasche 500ml", extras: [] },
-            { id: 25, name: "Tee", price: 4.00, desc: "Papier Tasse", extras: ["Jasmintee", "Grüner Tee"] },
-            { id: 26, name: "Kaffee", price: 4.00, desc: "Papier Tasse", extras: [] }
-        ]
-    };
-
-    let cart = [];
-    function showToast(msg) { let t=document.getElementById('toastMsg'); t.textContent=msg; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2500); }
-    function extractExtraPrice(extraName) { let m=extraName.match(/\([+\s]*([0-9,]+)\s*CHF/); return m ? parseFloat(m[1].replace(',','.')) : 0; }
-
-    function generateMenu() {
-        const menuSection = document.getElementById('menuSection');
-        if(!menuSection) return;
-        let html = `<div class="saturday-special">🎉 PARTY-SERVICE: Nur Samstag & Sonntag · ab 10 Personen · Erwachsene CHF 20.- / Kinder CHF 15.- (nur Essen) 🎉</div>`;
-        for(let [cat, items] of Object.entries(menuData)) {
-            html += `<div class="category"><h2>${cat}</h2><div class="menu-grid">`;
-            items.forEach(item => {
-                let base = item.price !== undefined ? item.price : (item.basePrice || 0);
-                html += `<div class="menu-card" data-id="${item.id}" data-base-price="${base}">
-                    <div class="menu-header"><span class="menu-name">${item.name}</span><span class="menu-price">CHF ${base.toFixed(2)}</span></div>
-                    <div class="menu-desc">${item.desc}</div>
-                    <div class="menu-extras">`;
-                
-                if(item.riceOptions) {
-                    html += `<div class="rice-group"><div class="group-title">🍚 Beilage (inklusive):</div>
-                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gedämpfter Reis" class="rice-radio"> Gedämpfter Reis</label>
-                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gebratener Reis" class="rice-radio"> Gebratener Reis</label>
-                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gebratene Nudeln" class="rice-radio"> Gebratene Nudeln</label></div>`;
-                }
-                
-                if(item.sauces && item.sauces.length) {
-                    html += `<div class="sauce-group"><div class="group-title">🍯 Sauce wählen (eine inklusive):</div>`;
-                    item.sauces.forEach(s => { 
-                        let sc = s.spice==="mild"?"spicy-mild":(s.spice==="hot"?"spicy-hot":"spicy-very");
-                        html += `<label class="extra-label"><input type="radio" name="sauce_${item.id}" data-sauce-name="${s.name}" class="sauce-radio"> ${s.name} <span class="${sc}">${s.spiceText}</span></label>`;
-                    });
-                    html += `</div>`;
-                }
-                
-                if(item.extras && item.extras.length) {
-                    item.extras.forEach((ex,idx) => { 
-                        let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
-                        html += `<label class="extra-label"><input type="${isRadio}" name="extra_${item.id}_${idx}" data-extra-name="${ex}" class="item-extra"> ${ex}</label>`;
-                    });
-                }
-                
-                html += `</div><div class="quantity-control"><button class="qty-btn minus-btn" data-id="${item.id}">-</button><span class="qty-number" id="qty-${item.id}">1</span><button class="qty-btn plus-btn" data-id="${item.id}">+</button></div>
-                <button class="add-to-cart" data-id="${item.id}">🛒 In den Warenkorb</button></div>`;
-            });
-            html += `</div></div>`;
-        }
-        menuSection.innerHTML = html;
-        attachEvents();
-    }
-
-    function attachEvents() {
-        document.querySelectorAll('.plus-btn').forEach(btn=>btn.addEventListener('click',e=>{ let id=btn.dataset.id; let span=document.getElementById(`qty-${id}`); let q=parseInt(span.innerText); if(q<99) span.innerText=q+1; }));
-        document.querySelectorAll('.minus-btn').forEach(btn=>btn.addEventListener('click',e=>{ let id=btn.dataset.id; let span=document.getElementById(`qty-${id}`); let q=parseInt(span.innerText); if(q>1) span.innerText=q-1; }));
-        document.querySelectorAll('.add-to-cart').forEach(btn=>btn.addEventListener('click',e=>{ addToCart(parseInt(btn.dataset.id)); }));
-    }
-
-    function addToCart(itemId, predefinedQty=null, forcedSauce=null, forcedRice=null, forcedExtras=[]) {
-        let found=null;
-        for(let items of Object.values(menuData)) { let f=items.find(i=>i.id===itemId); if(f){found={...f}; break;} }
-        if(!found) return;
-        let quantity = predefinedQty !== null ? predefinedQty : (document.getElementById(`qty-${itemId}`) ? parseInt(document.getElementById(`qty-${itemId}`).innerText) : 1);
-        let selectedSauce = forcedSauce || (document.querySelector(`.menu-card[data-id="${itemId}"] .sauce-radio:checked`)?.getAttribute('data-sauce-name') || "");
-        let selectedRice = forcedRice || (document.querySelector(`.menu-card[data-id="${itemId}"] .rice-radio:checked`)?.getAttribute('data-rice-name') || "");
-        let selectedExtras = [...forcedExtras];
-        let extraPriceSum=0;
-        if(!forcedExtras.length) {
-            document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ let name=inp.dataset.extraName; selectedExtras.push(name); extraPriceSum+=extractExtraPrice(name); });
-        } else {
-            forcedExtras.forEach(ex=>extraPriceSum+=extractExtraPrice(ex));
-        }
-        let itemName = found.name;
-        if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
-        if(selectedRice) itemName = `${itemName} (${selectedRice})`;
-        let basePrice = found.price !== undefined ? found.price : (found.basePrice || 0);
-        let total = (basePrice + extraPriceSum) * quantity;
-        cart.push({ id: Date.now()+Math.random(), name: itemName, quantity, extras: selectedExtras, totalPrice: total });
-        if(predefinedQty===null && document.getElementById(`qty-${itemId}`)) document.getElementById(`qty-${itemId}`).innerText="1";
-        document.querySelectorAll(`.menu-card[data-id="${itemId}"] input:checked`).forEach(i=>i.checked=false);
-        renderCart();
-        showToast(`✅ ${quantity}x ${itemName} hinzugefügt`);
-    }
-
-    function renderCart() {
-        const container = document.getElementById('cartItemsContainer');
-        const totalSpan = document.getElementById('cartTotal');
-        if(!container) return;
-        if(cart.length===0){ container.innerHTML='<div style="text-align:center; padding:1rem;">🛒 Warenkorb leer</div>'; totalSpan.innerHTML='Gesamt: CHF 0,00'; return; }
-        let html='', sum=0;
-        cart.forEach((it,idx)=>{ sum+=it.totalPrice;
-            html+=`<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${it.quantity}x ${it.name}</div>${it.extras.length?`<div class="cart-item-extras">+ ${it.extras.join(', ')}</div>`:''}</div><div class="cart-item-price">CHF ${it.totalPrice.toFixed(2)}</div><button class="remove-item" data-index="${idx}">🗑️</button></div>`;
-        });
-        container.innerHTML=html;
-        totalSpan.innerHTML=`Gesamt: CHF ${sum.toFixed(2)}`;
-        document.querySelectorAll('.remove-item').forEach(btn=>btn.addEventListener('click',e=>{ let idx=parseInt(btn.dataset.index); cart.splice(idx,1); renderCart(); }));
-    }
-
-    document.getElementById('partyOrderBtn')?.addEventListener('click', ()=>{
-        let adults = parseInt(document.getElementById('adultCount').value) || 0;
-        let children = parseInt(document.getElementById('childCount').value) || 0;
-        let totalGuests = adults + children;
-        let partyDate = document.getElementById('partyDate').value;
-        let partyTime = document.getElementById('partyTime').value;
-        let specialWishes = document.getElementById('partySpecialWishes')?.value || "–";
-        
-        if(totalGuests < 10) {
-            alert("❌ Party-Service ist nur für Gruppen ab 10 Personen möglich.\n\nAktuelle Gesamtzahl: " + totalGuests + " Personen");
-            return;
-        }
-        
-        if(!partyDate) {
-            alert("❌ Bitte wählen Sie ein Datum für Ihre Party aus.");
-            return;
-        }
-        
-        if(!partyTime) {
-            alert("❌ Bitte wählen Sie eine Uhrzeit für Ihre Party aus.");
-            return;
-        }
-        
-        const dateParts = partyDate.split('.');
-        if (dateParts.length === 3) {
-            const selectedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-            const dayOfWeek = selectedDate.getDay();
-            if (dayOfWeek !== 6 && dayOfWeek !== 0) {
-                const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-                alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}`);
-                return;
-            }
-        }
-        
-        let basePartyPrice = (adults * 20) + (children * 15);
-        let extraTotal = 0;
-        cart.forEach(i=>extraTotal+=i.totalPrice);
-        let grandTotal = basePartyPrice + extraTotal;
-        
-        let orderSummary = `🎊 PARTY-ANFRAGE (Nur Sa/So, ab 10 Pers.) 🎊\n\n`;
-        orderSummary += `Erwachsene: ${adults} à CHF 20.- = CHF ${(adults*20).toFixed(2)}\n`;
-        orderSummary += `Kinder: ${children} à CHF 15.- = CHF ${(children*15).toFixed(2)}\n`;
-        orderSummary += `Total Personen: ${totalGuests}\n`;
-        orderSummary += `Datum: ${partyDate}\n`;
-        orderSummary += `Uhrzeit: ${partyTime} Uhr\n`;
-        orderSummary += `Besondere Wünsche: ${specialWishes}\n\n`;
-        orderSummary += `📋 Bestellte Gerichte:\n`;
-        if(cart.length===0) orderSummary += `(keine Gerichte ausgewählt)\n`;
-        else cart.forEach(i=>{ orderSummary+=`${i.quantity}x ${i.name} – CHF ${i.totalPrice.toFixed(2)}\n`; });
-        orderSummary += `\n──────────────────────\n`;
-        orderSummary += `💰 Geschätzter Gesamtbetrag: CHF ${grandTotal.toFixed(2)}\n\n`;
-        orderSummary += `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten\n☎️ 071 755 08 88\n\n`;
-        orderSummary += `💬 Für ein individuelles Menü kontaktieren Sie uns bitte direkt.`;
-        
-        alert(orderSummary);
-        showToast("✅ Party-Anfrage gesendet! Wir melden uns bei Ihnen.");
-        
-        sendWhatsAppOrder({
-            items: orderSummary,
-            total: grandTotal.toFixed(2),
-            pickupDate: partyDate,
-            pickupTime: partyTime,
-            notes: specialWishes
-        });
-    });
-
-    function handleCashPayment() {
-        const pickupDateTime = document.getElementById('pickupDateTimeSelect')?.value;
-        
-        if(cart.length === 0) {
-            alert("❌ Warenkorb ist leer. Bitte fügen Sie Gerichte hinzu.");
-            return;
-        }
-        if(!pickupDateTime) {
-            alert("❌ Bitte wählen Sie eine Abholzeit aus.");
-            return;
-        }
-        
-        const [dateStr, timeStr] = pickupDateTime.split('|');
-        const formattedDate = new Date(dateStr).toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        
-        let sum = cart.reduce((s,i)=>s+i.totalPrice,0);
-        
-        let itemsText = "";
-        cart.forEach(item => {
-            itemsText += `${item.quantity}x ${item.name} – CHF ${item.totalPrice.toFixed(2)}\n`;
-        });
-        
-        alert(`🏪 Bezahlung vor Ort (Bar oder Karte)\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bezahlen. Vielen Dank!`);
-        
-        sendWhatsAppOrder({
-            items: itemsText,
-            total: sum.toFixed(2),
-            pickupDate: formattedDate,
-            pickupTime: timeStr,
-            notes: ""
-        });
-        
-        cart = []; 
-        renderCart(); 
-        document.getElementById('pickupDateTimeSelect').value = "";
-        showToast("✅ Bestellung abgeschlossen! Wir freuen uns auf Ihren Besuch.");
-    }
-    
-    document.getElementById('cashPayBtn')?.addEventListener('click', handleCashPayment);
-    document.getElementById('clearCartBtn')?.addEventListener('click',()=>{ cart=[]; renderCart(); showToast("Warenkorb geleert"); });
-
-    document.getElementById('navHome')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-    document.getElementById('navMenu')?.addEventListener('click',()=>document.getElementById('menuSection')?.scrollIntoView({behavior:'smooth'}));
-    document.getElementById('navParty')?.addEventListener('click',()=>document.getElementById('partyServiceBox')?.scrollIntoView({behavior:'smooth'}));
-    document.getElementById('navContact')?.addEventListener('click',()=>document.querySelector('.footer')?.scrollIntoView({behavior:'smooth'}));
-    
-    generateMenu();
-    generatePickupDateTimeOptions();
-    generateQRCode();
-    initGermanDatePicker();
-    renderCart();
-</script>
-</body>
-</html>
+        { name: "Satay-Soße",
