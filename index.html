@@ -1055,8 +1055,7 @@
                     html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
                     item.riceOptions.forEach((rice, idx) => {
                         let defaultChecked = rice.isDefault ? 'checked' : '';
-                        let priceDisplay = rice.price > 0 ? `+${rice.price.toFixed(2)} CHF` : 'ohne Aufpreis';
-                        html += `<label class="extra-label"><input type="radio" name="rice_${item.id}" value="${rice.value}" data-rice-name="${rice.name}" data-rice-price="${rice.price}" class="rice-radio" ${defaultChecked}> ${rice.name} (${priceDisplay})</label>`;
+                        html += `<label class="extra-label"><input type="radio" name="rice_${item.id}" value="${rice.value}" data-rice-name="${rice.name}" data-rice-price="${rice.price}" class="rice-radio" ${defaultChecked}> ${rice.name}</label>`;
                     });
                     html += `</div>`;
                 }
@@ -1142,11 +1141,9 @@
             itemName = `${found.name} (${selectedRice}) mit ${mainDishes.join(' & ')}`;
         } else {
             if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
-            if(selectedRice && !found.mileMix) {
-                // 如果是默认的 Gedämpfter Reis，不显示在名称中，其他显示
-                if(selectedRice !== "Gedämpfter Reis (ohne Aufpreis)") {
-                    itemName = `${itemName} (${selectedRice})`;
-                }
+            // 只显示非默认的 Beilage (即只显示 Gebratener Reis 或 Gebratene Nudeln)
+            if(selectedRice && !found.mileMix && selectedRice !== "Gedämpfter Reis (ohne Aufpreis)") {
+                itemName = `${itemName} (${selectedRice})`;
             }
             if(selectedExtras.length > 0 && !found.mileMix && !found.riceOptions) {
                 itemName = `${itemName} (${selectedExtras[0]})`;
