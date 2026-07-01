@@ -546,24 +546,24 @@
             pointer-events: none;
         }
 
-        /* ===== "Nach oben" Button ===== */
+        /* ===== "Nach oben" Button - RECHTS ===== */
         .scroll-top-btn {
             position: fixed;
             bottom: 30px;
-            left: 30px;
+            right: 30px;
             width: 55px;
             height: 55px;
-            background: rgba(126, 158, 181, 0.85);
+            background: rgba(126, 158, 181, 0.9);
             color: white;
             border: none;
             border-radius: 50%;
             font-size: 1.8rem;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(20px);
+            transform: translateY(20px) scale(0.9);
             z-index: 1100;
             display: flex;
             align-items: center;
@@ -572,11 +572,15 @@
         .scroll-top-btn.visible {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
         .scroll-top-btn:hover {
             background: #7e9eb5;
             transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        .scroll-top-btn:active {
+            transform: scale(0.95);
         }
 
         /* ===== Bildergalerie Styles ===== */
@@ -639,7 +643,7 @@
                 height: 48px;
                 font-size: 1.4rem;
                 bottom: 20px;
-                left: 20px;
+                right: 20px;
             }
         }
         @media (max-width: 480px) {
@@ -652,7 +656,7 @@
 
 <div class="toast-notify" id="toastMsg">✨ Aktion erfolgreich</div>
 
-<!-- ===== "Nach oben" Button ===== -->
+<!-- ===== "Nach oben" Button - RECHTS ===== -->
 <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Nach oben scrollen">⬆</button>
 
 <div class="header" id="top">
