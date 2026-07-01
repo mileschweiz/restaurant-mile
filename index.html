@@ -940,10 +940,11 @@
         { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
     ];
     
-    // 注意：这里把 commonExtras 改为两个独立的选项，用于 radio 按钮
-    const commonExtras = [
-        { name: "Gebratener Reis statt gedämpft (+2.00 CHF)", value: "gebratener_reis" },
-        { name: "Gebratene Nudeln statt gedämpft (+2.00 CHF)", value: "gebratene_nudeln" }
+    // Beilagen-Optionen für Hauptgerichte - Gedämpfter Reis ist Standard (ohne Aufpreis)
+    const riceOptions = [
+        { name: "Gedämpfter Reis (ohne Aufpreis)", value: "gedämpfter_reis", price: 0, isDefault: true },
+        { name: "Gebratener Reis (+2.00 CHF)", value: "gebratener_reis", price: 2.00, isDefault: false },
+        { name: "Gebratene Nudeln (+2.00 CHF)", value: "gebratene_nudeln", price: 2.00, isDefault: false }
     ];
 
     // Mile Mix 可选主菜列表
@@ -969,10 +970,10 @@
             { id: 3, name: "Kartoffelsalat", price: 4.00, desc: "Asiatischer Kartoffelsalat", extras: [] }
         ],
         "🍛 Hauptgerichte (inkl. gedämpfter Reis)": [
-            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, extras: commonExtras, extraType: "radio" },
-            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, extras: commonExtras, extraType: "radio" },
-            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, extras: commonExtras, extraType: "radio" },
-            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", extras: commonExtras, extraType: "radio" }
+            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, riceOptions: riceOptions },
+            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, riceOptions: riceOptions },
+            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, riceOptions: riceOptions },
+            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", riceOptions: riceOptions }
         ],
         "🥬 Vegetarisch": [
             { id: 8, name: "Vegetarisches Menü", price: 14.00, desc: "Saisonales Gemüse · inkl. gedämpfter Reis (ohne Aufpreis)", sauces: vegiSauceOptions, extras: [] }
@@ -1049,25 +1050,24 @@
                     html += `</div>`;
                 }
                 
-                // 处理 Extras - 如果是 Hauptgerichte 且 extraType 为 radio，使用 radio 按钮
-                if(item.extras && item.extras.length && !item.mileMix) {
-                    // 检查是否是 Hauptgerichte（有 extraType: "radio"）
-                    if(item.extraType === "radio") {
-                        html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
-                        // 添加 "Keine Änderung" 选项
-                        html += `<label class="extra-label"><input type="radio" name="extra_${item.id}" value="keine" class="item-extra-radio" data-extra-name=""> Keine Änderung (gedämpfter Reis)</label>`;
-                        item.extras.forEach((ex, idx) => {
-                            html += `<label class="extra-label"><input type="radio" name="extra_${item.id}" value="${ex.name}" class="item-extra-radio" data-extra-name="${ex.name}"> ${ex.name}</label>`;
-                        });
-                        html += `</div>`;
-                    } else {
-                        // 其他情况用 checkbox
-                        item.extras.forEach((ex, idx) => {
-                            let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
-                            let nameAttr = isRadio === 'radio' ? `extra_${item.id}` : `extra_${item.id}_${idx}`;
-                            html += `<label class="extra-label"><input type="${isRadio}" name="${nameAttr}" data-extra-name="${ex}" class="item-extra"> ${ex}</label>`;
-                        });
-                    }
+                // 处理 Hauptgerichte 的 Beilage-Optionen (三选一)
+                if(item.riceOptions && !item.mileMix) {
+                    html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
+                    item.riceOptions.forEach((rice, idx) => {
+                        let defaultChecked = rice.isDefault ? 'checked' : '';
+                        let priceDisplay = rice.price > 0 ? `+${rice.price.toFixed(2)} CHF` : 'ohne Aufpreis';
+                        html += `<label class="extra-label"><input type="radio" name="rice_${item.id}" value="${rice.value}" data-rice-name="${rice.name}" data-rice-price="${rice.price}" class="rice-radio" ${defaultChecked}> ${rice.name} (${priceDisplay})</label>`;
+                    });
+                    html += `</div>`;
+                }
+                
+                // 处理其他 Extras (非 Hauptgerichte)
+                if(item.extras && item.extras.length && !item.mileMix && !item.riceOptions) {
+                    item.extras.forEach((ex, idx) => {
+                        let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
+                        let nameAttr = isRadio === 'radio' ? `extra_${item.id}` : `extra_${item.id}_${idx}`;
+                        html += `<label class="extra-label"><input type="${isRadio}" name="${nameAttr}" data-extra-name="${ex}" class="item-extra"> ${ex}</label>`;
+                    });
                 }
                 
                 html += `</div><div class="quantity-control"><button class="qty-btn minus-btn" data-id="${item.id}">-</button><span class="qty-number" id="qty-${item.id}">1</span><button class="qty-btn plus-btn" data-id="${item.id}">+</button></div>
@@ -1091,7 +1091,7 @@
         if(!found) return;
         let quantity = predefinedQty !== null ? predefinedQty : (document.getElementById(`qty-${itemId}`) ? parseInt(document.getElementById(`qty-${itemId}`).innerText) : 1);
         let selectedSauce = forcedSauce || (document.querySelector(`.menu-card[data-id="${itemId}"] .sauce-radio:checked`)?.getAttribute('data-sauce-name') || "");
-        let selectedRice = forcedRice || (document.querySelector(`.menu-card[data-id="${itemId}"] .milemix-rice:checked`)?.value || "");
+        let selectedRice = forcedRice || "";
         let selectedExtras = [...forcedExtras];
         let extraPriceSum=0;
         let mainDishes = [];
@@ -1114,29 +1114,26 @@
             }
             mainInputs.forEach(inp => mainDishes.push(inp.value));
         } else {
-            // 处理 radio 类型的 extras (Hauptgerichte)
-            if(found.extraType === "radio") {
-                const radioChecked = document.querySelector(`.menu-card[data-id="${itemId}"] .item-extra-radio:checked`);
-                if (radioChecked) {
-                    const extraName = radioChecked.dataset.extraName;
-                    if (extraName) {
-                        selectedExtras.push(extraName);
-                        extraPriceSum += extractExtraPrice(extraName);
+            // 处理 Hauptgerichte 的 Beilage (riceOptions)
+            if(found.riceOptions) {
+                const riceChecked = document.querySelector(`.menu-card[data-id="${itemId}"] .rice-radio:checked`);
+                if (riceChecked) {
+                    selectedRice = riceChecked.dataset.riceName;
+                    extraPriceSum += parseFloat(riceChecked.dataset.ricePrice) || 0;
+                }
+            }
+            
+            // 处理普通 extras (checkbox)
+            if(!forcedExtras.length && !found.riceOptions) {
+                document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ 
+                    let name=inp.dataset.extraName; 
+                    if(name) {
+                        selectedExtras.push(name); 
+                        extraPriceSum+=extractExtraPrice(name);
                     }
-                }
-            } else {
-                // 普通 checkbox 处理
-                if(!forcedExtras.length) {
-                    document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ 
-                        let name=inp.dataset.extraName; 
-                        if(name) {
-                            selectedExtras.push(name); 
-                            extraPriceSum+=extractExtraPrice(name);
-                        }
-                    });
-                } else {
-                    forcedExtras.forEach(ex=>extraPriceSum+=extractExtraPrice(ex));
-                }
+                });
+            } else if(forcedExtras.length && !found.riceOptions) {
+                forcedExtras.forEach(ex=>extraPriceSum+=extractExtraPrice(ex));
             }
         }
         
@@ -1145,10 +1142,13 @@
             itemName = `${found.name} (${selectedRice}) mit ${mainDishes.join(' & ')}`;
         } else {
             if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
-            if(selectedRice && !found.mileMix) itemName = `${itemName} (${selectedRice})`;
-            // 如果有选中的 extra，添加到名称中
-            if(selectedExtras.length > 0 && !found.mileMix) {
-                // 只显示第一个 extra（因为 radio 只能选一个）
+            if(selectedRice && !found.mileMix) {
+                // 如果是默认的 Gedämpfter Reis，不显示在名称中，其他显示
+                if(selectedRice !== "Gedämpfter Reis (ohne Aufpreis)") {
+                    itemName = `${itemName} (${selectedRice})`;
+                }
+            }
+            if(selectedExtras.length > 0 && !found.mileMix && !found.riceOptions) {
                 itemName = `${itemName} (${selectedExtras[0]})`;
             }
         }
@@ -1156,7 +1156,15 @@
         let total = (basePrice + extraPriceSum) * quantity;
         cart.push({ id: Date.now()+Math.random(), name: itemName, quantity, extras: selectedExtras, totalPrice: total });
         if(predefinedQty===null && document.getElementById(`qty-${itemId}`)) document.getElementById(`qty-${itemId}`).innerText="1";
-        document.querySelectorAll(`.menu-card[data-id="${itemId}"] input:checked`).forEach(i=>i.checked=false);
+        // 清除所有选中的输入框
+        document.querySelectorAll(`.menu-card[data-id="${itemId}"] input:checked`).forEach(i=>{
+            // 如果是 radio 且是默认选项，保留选中状态
+            if(i.classList.contains('rice-radio') && i.dataset.ricePrice === '0') {
+                // 保留默认选项
+            } else {
+                i.checked = false;
+            }
+        });
         renderCart();
         showToast(`✅ ${quantity}x ${itemName} hinzugefügt`);
     }
