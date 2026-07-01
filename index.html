@@ -1018,10 +1018,10 @@
             { id: 3, name: "Kartoffelsalat", price: 4.00, desc: "Asiatischer Kartoffelsalat", extras: [] }
         ],
         "🍛 Hauptgerichte (inkl. gedämpfter Reis)": [
-            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, riceOptions: riceOptions },
-            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, riceOptions: riceOptions },
-            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, riceOptions: riceOptions },
-            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", riceOptions: riceOptions }
+            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch", sauces: pouletSauceOptions, riceOptions: riceOptions },
+            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten", sauces: crevettenSauceOptions, riceOptions: riceOptions },
+            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch", sauces: rindfleischSauceOptions, riceOptions: riceOptions },
+            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente", riceOptions: riceOptions }
         ],
         "🥬 Vegetarisch": [
             { id: 8, name: "Vegetarisches Menü", price: 14.00, desc: "Saisonales Gemüse · inkl. gedämpfter Reis (ohne Aufpreis)", sauces: vegiSauceOptions, extras: [] }
@@ -1075,7 +1075,7 @@
                 
                 // Mile Mix 特殊处理
                 if(item.mileMix) {
-                    html += `<div class="milemix-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
+                    html += `<div class="milemix-group"><div class="group-title">🍚 Beilage wählen:</div>`;
                     mileMixRiceOptions.forEach((rice, idx) => {
                         let defaultChecked = rice.isDefault ? 'checked' : '';
                         html += `<label class="extra-label"><input type="radio" name="milemix_rice" value="${rice.name}" class="milemix-rice" ${defaultChecked}> ${rice.name}</label>`;
@@ -1099,9 +1099,9 @@
                     html += `</div>`;
                 }
                 
-                // 处理 Hauptgerichte 的 Beilage-Optionen (三选一)
+                // 处理 Hauptgerichte 的 Beilage-Optionen (三选一) - ohne "(eine inklusive)"
                 if(item.riceOptions && !item.mileMix) {
-                    html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
+                    html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen:</div>`;
                     item.riceOptions.forEach((rice, idx) => {
                         let defaultChecked = rice.isDefault ? 'checked' : '';
                         html += `<label class="extra-label"><input type="radio" name="rice_${item.id}" value="${rice.value}" data-rice-name="${rice.name}" data-rice-price="${rice.price}" class="rice-radio" ${defaultChecked}> ${rice.name}</label>`;
