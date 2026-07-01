@@ -64,6 +64,31 @@
             background: rgba(255,255,255,0.32);
         }
 
+        /* ===== QR Code Banner oben ===== */
+        .qrcode-banner {
+            background: #fef8f0;
+            border-bottom: 1px solid #e8e0d0;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .qrcode-banner img {
+            max-height: 60px;
+            width: auto;
+            border-radius: 8px;
+        }
+        .qrcode-banner .banner-text {
+            font-size: 0.85rem;
+            color: #b45f2b;
+            font-weight: 500;
+        }
+        .qrcode-banner .banner-text span {
+            font-weight: 700;
+        }
+
         .hours-banner {
             background: #e0e8f0;
             color: #6a7e8e;
@@ -162,7 +187,7 @@
             margin-right: 0.5rem;
         }
 
-        .sauce-group, .rice-group {
+        .sauce-group, .rice-group, .milemix-group, .extra-group {
             background: #eef3f8;
             border-radius: 12px;
             padding: 0.5rem;
@@ -223,34 +248,6 @@
             position: sticky;
             top: 1rem;
             align-self: flex-start;
-        }
-
-        .qrcode-card {
-            background: #fef8f0;
-            border-radius: 24px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            border: 1px solid #e8e0d0;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-        }
-        .qrcode-card h4 {
-            color: #b45f2b;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .qrcode-card img {
-            max-width: 120px;
-            height: auto;
-            margin: 0.5rem 0;
-        }
-        .qrcode-card p {
-            font-size: 0.7rem;
-            color: #8a9bb0;
         }
 
         .cart-card, .party-card {
@@ -601,6 +598,8 @@
             .datetime-wrapper { flex-direction: column; }
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
             .gallery-item img { height: 150px; }
+            .qrcode-banner { flex-direction: column; text-align: center; padding: 0.8rem; }
+            .qrcode-banner img { max-height: 50px; }
         }
         @media (max-width: 480px) {
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
@@ -624,6 +623,14 @@
     </div>
 </div>
 
+<!-- ===== QR CODE BANNER OBEN ===== -->
+<div class="qrcode-banner" id="qrcodeBanner">
+    <img id="qrcodeBannerImage" src="" alt="QR Code">
+    <div class="banner-text">
+        📱 <span>WhatsApp Bestellung</span> – Einfach scannen und loslegen!
+    </div>
+</div>
+
 <div class="hours-banner" id="hoursBanner">
     📍 Markgasse 16, 9450 Altstätten | ☎️ 071 755 08 88<br>
     🕐 Di - Fr 11:00 - 14:00 · Sa 11:00 - 15:00<br>
@@ -642,12 +649,6 @@
     <div class="menu-section" id="menuSection"></div>
     
     <div class="cart-sidebar">
-        <div class="qrcode-card">
-            <h4>📱 WhatsApp Bestellung</h4>
-            <img id="qrcodeImage" src="" alt="QR Code">
-            <p>Bequem per WhatsApp bestellen – Einfach scannen und loslegen!</p>
-        </div>
-        
         <div class="cart-card">
             <div class="cart-title">
                 🛒 Warenkorb
@@ -819,11 +820,11 @@
         });
     }
     
-    // ========== 生成二维码 ==========
+    // ========== 生成二维码（用于上方 Banner） ==========
     function generateQRCode() {
         const websiteUrl = 'https://mileschweiz.github.io/restaurant-mile/';
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(websiteUrl)}`;
-        document.getElementById('qrcodeImage').src = qrApiUrl;
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(websiteUrl)}`;
+        document.getElementById('qrcodeBannerImage').src = qrApiUrl;
     }
     
     const RESTAURANT_PHONE = '41774614837';
@@ -939,7 +940,27 @@
         { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
     ];
     
-    const commonExtras = ["Gebratener Reis statt gedämpft (+2.00 CHF)", "Gebratene Nudeln statt gedämpft (+2.00 CHF)"];
+    // 注意：这里把 commonExtras 改为两个独立的选项，用于 radio 按钮
+    const commonExtras = [
+        { name: "Gebratener Reis statt gedämpft (+2.00 CHF)", value: "gebratener_reis" },
+        { name: "Gebratene Nudeln statt gedämpft (+2.00 CHF)", value: "gebratene_nudeln" }
+    ];
+
+    // Mile Mix 可选主菜列表
+    const mileMixMainDishes = [
+        { name: "Poulet mit süss-saurer Sosse", price: 0 },
+        { name: "Poulet mit malaysischer Currysosse", price: 0 },
+        { name: "Crevette mit Rot-Thai Currysosse", price: 0 },
+        { name: "Rindfleisch mit vietnamesischer Sosse", price: 0 },
+        { name: "Knusprige Ente", price: 0 }
+    ];
+
+    // Mile Mix 可选 Beilage
+    const mileMixRiceOptions = [
+        { name: "Gedämpfter Reis", price: 0 },
+        { name: "Gebratener Reis", price: 0 },
+        { name: "Gebratene Nudeln", price: 0 }
+    ];
 
     const menuData = {
         "🥟 Vorspeisen": [
@@ -948,10 +969,10 @@
             { id: 3, name: "Kartoffelsalat", price: 4.00, desc: "Asiatischer Kartoffelsalat", extras: [] }
         ],
         "🍛 Hauptgerichte (inkl. gedämpfter Reis)": [
-            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, extras: commonExtras },
-            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, extras: commonExtras },
-            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, extras: commonExtras },
-            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", extras: commonExtras }
+            { id: 4, name: "Poulet", basePrice: 14.00, desc: "Zartes Pouletfleisch · inkl. gedämpfter Reis", sauces: pouletSauceOptions, extras: commonExtras, extraType: "radio" },
+            { id: 5, name: "Crevetten", basePrice: 16.00, desc: "Frische Crevetten · inkl. gedämpfter Reis", sauces: crevettenSauceOptions, extras: commonExtras, extraType: "radio" },
+            { id: 6, name: "Rindfleisch", basePrice: 16.00, desc: "Zartes Rindfleisch · inkl. gedämpfter Reis", sauces: rindfleischSauceOptions, extras: commonExtras, extraType: "radio" },
+            { id: 7, name: "Knusprige Ente", basePrice: 18.00, desc: "Knusprig gebratene Ente · inkl. gedämpfter Reis", extras: commonExtras, extraType: "radio" }
         ],
         "🥬 Vegetarisch": [
             { id: 8, name: "Vegetarisches Menü", price: 14.00, desc: "Saisonales Gemüse · inkl. gedämpfter Reis (ohne Aufpreis)", sauces: vegiSauceOptions, extras: [] }
@@ -961,8 +982,8 @@
             { id: 10, name: "Gebratene Nudeln", price: 10.00, desc: "Mit Gemüse und Sojasoße", extras: [] },
             { id: 11, name: "Gedämpfter Reis", price: 6.00, desc: "Extra Portion gedämpfter Reis", extras: [] }
         ],
-        "🍚🍤 Mixed-Mix Spezial": [
-            { id: 12, name: "Mixed-Mix", price: 17.00, desc: "Wähle zwei Hauptgerichte (Poulet, Rind, Crevetten) · inkl. Beilage", riceOptions: true }
+        "🍚🍤 Mile Mix Spezial": [
+            { id: 12, name: "Mile Mix", price: 17.00, desc: "Wähle eine Beilage und zwei Hauptgerichte", mileMix: true }
         ],
         "⭐ Samstag Special": [
             { id: 22, name: "Nudelsuppe mit Entenfleisch", price: 17.00, desc: "Nur Samstag!", extras: [] }
@@ -1003,14 +1024,23 @@
                     <div class="menu-desc">${item.desc}</div>
                     <div class="menu-extras">`;
                 
-                if(item.riceOptions) {
-                    html += `<div class="rice-group"><div class="group-title">🍚 Beilage (inklusive):</div>
-                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gedämpfter Reis" class="rice-radio"> Gedämpfter Reis</label>
-                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gebratener Reis" class="rice-radio"> Gebratener Reis</label>
-                        <label class="extra-label"><input type="radio" name="rice_${item.id}" data-rice-name="Gebratene Nudeln" class="rice-radio"> Gebratene Nudeln</label></div>`;
+                // Mile Mix 特殊处理
+                if(item.mileMix) {
+                    html += `<div class="milemix-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
+                    mileMixRiceOptions.forEach((rice, idx) => {
+                        html += `<label class="extra-label"><input type="radio" name="milemix_rice" value="${rice.name}" class="milemix-rice"> ${rice.name}</label>`;
+                    });
+                    html += `</div>`;
+                    
+                    html += `<div class="milemix-group"><div class="group-title">🍛 Zwei Hauptgerichte wählen (Preis inklusive):</div>`;
+                    mileMixMainDishes.forEach((dish, idx) => {
+                        html += `<label class="extra-label"><input type="checkbox" name="milemix_main" value="${dish.name}" class="milemix-main" data-price="${dish.price}"> ${dish.name}</label>`;
+                    });
+                    html += `<p style="font-size:0.65rem; color:#8a9bb0; margin-top:0.3rem;">⚠️ Bitte wählen Sie genau zwei Hauptgerichte aus.</p>`;
+                    html += `</div>`;
                 }
                 
-                if(item.sauces && item.sauces.length) {
+                if(item.sauces && item.sauces.length && !item.mileMix) {
                     html += `<div class="sauce-group"><div class="group-title">🍯 Sauce wählen (eine inklusive):</div>`;
                     item.sauces.forEach(s => { 
                         let sc = s.spice==="mild"?"spicy-mild":(s.spice==="hot"?"spicy-hot":"spicy-very");
@@ -1019,11 +1049,25 @@
                     html += `</div>`;
                 }
                 
-                if(item.extras && item.extras.length) {
-                    item.extras.forEach((ex,idx) => { 
-                        let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
-                        html += `<label class="extra-label"><input type="${isRadio}" name="extra_${item.id}_${idx}" data-extra-name="${ex}" class="item-extra"> ${ex}</label>`;
-                    });
+                // 处理 Extras - 如果是 Hauptgerichte 且 extraType 为 radio，使用 radio 按钮
+                if(item.extras && item.extras.length && !item.mileMix) {
+                    // 检查是否是 Hauptgerichte（有 extraType: "radio"）
+                    if(item.extraType === "radio") {
+                        html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen (eine inklusive):</div>`;
+                        // 添加 "Keine Änderung" 选项
+                        html += `<label class="extra-label"><input type="radio" name="extra_${item.id}" value="keine" class="item-extra-radio" data-extra-name=""> Keine Änderung (gedämpfter Reis)</label>`;
+                        item.extras.forEach((ex, idx) => {
+                            html += `<label class="extra-label"><input type="radio" name="extra_${item.id}" value="${ex.name}" class="item-extra-radio" data-extra-name="${ex.name}"> ${ex.name}</label>`;
+                        });
+                        html += `</div>`;
+                    } else {
+                        // 其他情况用 checkbox
+                        item.extras.forEach((ex, idx) => {
+                            let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
+                            let nameAttr = isRadio === 'radio' ? `extra_${item.id}` : `extra_${item.id}_${idx}`;
+                            html += `<label class="extra-label"><input type="${isRadio}" name="${nameAttr}" data-extra-name="${ex}" class="item-extra"> ${ex}</label>`;
+                        });
+                    }
                 }
                 
                 html += `</div><div class="quantity-control"><button class="qty-btn minus-btn" data-id="${item.id}">-</button><span class="qty-number" id="qty-${item.id}">1</span><button class="qty-btn plus-btn" data-id="${item.id}">+</button></div>
@@ -1047,17 +1091,67 @@
         if(!found) return;
         let quantity = predefinedQty !== null ? predefinedQty : (document.getElementById(`qty-${itemId}`) ? parseInt(document.getElementById(`qty-${itemId}`).innerText) : 1);
         let selectedSauce = forcedSauce || (document.querySelector(`.menu-card[data-id="${itemId}"] .sauce-radio:checked`)?.getAttribute('data-sauce-name') || "");
-        let selectedRice = forcedRice || (document.querySelector(`.menu-card[data-id="${itemId}"] .rice-radio:checked`)?.getAttribute('data-rice-name') || "");
+        let selectedRice = forcedRice || (document.querySelector(`.menu-card[data-id="${itemId}"] .milemix-rice:checked`)?.value || "");
         let selectedExtras = [...forcedExtras];
         let extraPriceSum=0;
-        if(!forcedExtras.length) {
-            document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ let name=inp.dataset.extraName; selectedExtras.push(name); extraPriceSum+=extractExtraPrice(name); });
+        let mainDishes = [];
+        
+        // Mile Mix 特殊处理
+        if(found.mileMix) {
+            // 获取选择的Beilage
+            const riceInput = document.querySelector(`.menu-card[data-id="${itemId}"] .milemix-rice:checked`);
+            if (!riceInput) {
+                alert("❌ Bitte wählen Sie eine Beilage für den Mile Mix aus.");
+                return;
+            }
+            selectedRice = riceInput.value;
+            
+            // 获取选择的主菜
+            const mainInputs = document.querySelectorAll(`.menu-card[data-id="${itemId}"] .milemix-main:checked`);
+            if (mainInputs.length !== 2) {
+                alert("❌ Bitte wählen Sie genau zwei Hauptgerichte für den Mile Mix aus.");
+                return;
+            }
+            mainInputs.forEach(inp => mainDishes.push(inp.value));
         } else {
-            forcedExtras.forEach(ex=>extraPriceSum+=extractExtraPrice(ex));
+            // 处理 radio 类型的 extras (Hauptgerichte)
+            if(found.extraType === "radio") {
+                const radioChecked = document.querySelector(`.menu-card[data-id="${itemId}"] .item-extra-radio:checked`);
+                if (radioChecked) {
+                    const extraName = radioChecked.dataset.extraName;
+                    if (extraName) {
+                        selectedExtras.push(extraName);
+                        extraPriceSum += extractExtraPrice(extraName);
+                    }
+                }
+            } else {
+                // 普通 checkbox 处理
+                if(!forcedExtras.length) {
+                    document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ 
+                        let name=inp.dataset.extraName; 
+                        if(name) {
+                            selectedExtras.push(name); 
+                            extraPriceSum+=extractExtraPrice(name);
+                        }
+                    });
+                } else {
+                    forcedExtras.forEach(ex=>extraPriceSum+=extractExtraPrice(ex));
+                }
+            }
         }
+        
         let itemName = found.name;
-        if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
-        if(selectedRice) itemName = `${itemName} (${selectedRice})`;
+        if(found.mileMix) {
+            itemName = `${found.name} (${selectedRice}) mit ${mainDishes.join(' & ')}`;
+        } else {
+            if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
+            if(selectedRice && !found.mileMix) itemName = `${itemName} (${selectedRice})`;
+            // 如果有选中的 extra，添加到名称中
+            if(selectedExtras.length > 0 && !found.mileMix) {
+                // 只显示第一个 extra（因为 radio 只能选一个）
+                itemName = `${itemName} (${selectedExtras[0]})`;
+            }
+        }
         let basePrice = found.price !== undefined ? found.price : (found.basePrice || 0);
         let total = (basePrice + extraPriceSum) * quantity;
         cart.push({ id: Date.now()+Math.random(), name: itemName, quantity, extras: selectedExtras, totalPrice: total });
