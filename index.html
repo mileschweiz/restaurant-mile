@@ -109,6 +109,10 @@
         .info-banner .hours-section .special-day {
             color: #c27e4a;
             font-weight: 700;
+            background: #fef0e0;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .container {
@@ -699,7 +703,7 @@
         📍 Markgasse 16, 9450 Altstätten | ☎️ 071 755 08 88<br>
         <strong>🕐 Öffnungszeiten:</strong><br>
         Di - Fr 11:00 - 14:00 · Sa 11:00 - 15:00<br>
-        <span class="special-day">⭐ Sonderöffnung: So 17.08.2026 11:00 - 14:00 ⭐</span><br>
+        <span class="special-day">⭐ Sonderöffnung: Mo 17.08.2026 11:00 - 14:00 ⭐</span><br>
         🎉 Party-Service: NUR Samstag & Sonntag · ab 10 Personen
     </div>
 </div>
@@ -736,7 +740,7 @@
                     <option value="">-- Bitte wählen Sie eine Abholzeit --</option>
                 </select>
                 <p style="font-size:0.7rem; color:#8a9bb0; margin-top:0.3rem;">
-                    Di-Fr 11:00-14:00 · Sa 11:00-15:00 · So 17.08.2026 11:00-14:00 (alle 15 Minuten)
+                    Di-Fr 11:00-14:00 · Sa 11:00-15:00 · Mo 17.08.2026 11:00-14:00 (alle 15 Minuten)
                 </p>
             </div>
             
@@ -869,7 +873,8 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Erlaube Samstag (6), Sonntag (0) und den speziellen 17.08.2026
+        // Erlaube Samstag (6), Sonntag (0)
+        // Der 17.08.2026 ist ein MONTAG - wird als Sonderöffnungstag hinzugefügt
         flatpickr(datePicker, {
             locale: 'de',
             dateFormat: 'd.m.Y',
@@ -877,11 +882,11 @@
             minDate: today,
             disable: [
                 function(date) {
-                    // Prüfe ob es der 17.08.2026 ist
+                    // Prüfe ob es der 17.08.2026 ist (Montag)
                     const isSpecialDay = date.getFullYear() === 2026 && 
                                          date.getMonth() === 7 && 
                                          date.getDate() === 17;
-                    // Erlaube Samstag (6), Sonntag (0) und den speziellen Tag
+                    // Erlaube Samstag (6), Sonntag (0) und den speziellen Tag (17.08.2026)
                     return (date.getDay() !== 6 && date.getDay() !== 0) && !isSpecialDay;
                 }
             ],
@@ -973,7 +978,7 @@
         const minTime = new Date(now.getTime() + 30 * 60000);
         const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
         
-        // Spezielle Öffnung am 17.08.2026 (Sonntag)
+        // Spezielle Öffnung am 17.08.2026 (Montag)
         const specialDay = new Date(2026, 7, 17); // 17.08.2026
         
         for (let i = 0; i <= 14; i++) {
@@ -981,12 +986,12 @@
             date.setDate(now.getDate() + i);
             const dayOfWeek = date.getDay();
             
-            // Prüfe ob es der spezielle Tag ist
+            // Prüfe ob es der spezielle Tag ist (17.08.2026)
             const isSpecialDay = date.getFullYear() === 2026 && 
                                  date.getMonth() === 7 && 
                                  date.getDate() === 17;
             
-            // Erlaube Di-Sa (2-6) und den speziellen Sonntag
+            // Erlaube Di-Sa (2-6) und den speziellen Montag
             if ((dayOfWeek >= 2 && dayOfWeek <= 6) || isSpecialDay) {
                 const dateStr = date.toISOString().split('T')[0];
                 const weekdayName = weekdays[dayOfWeek];
@@ -994,7 +999,7 @@
                 
                 let times = [];
                 if (isSpecialDay) {
-                    // Spezieller Sonntag: 11:00 - 14:00
+                    // Spezieller Montag: 11:00 - 14:00
                     for (let hour = 11; hour <= 14; hour++) {
                         let endMinute = (hour === 14) ? 0 : 45;
                         for (let min = 0; min <= endMinute; min += 15) {
@@ -1004,6 +1009,7 @@
                         }
                     }
                 } else if (dayOfWeek >= 2 && dayOfWeek <= 5) {
+                    // Di - Fr: 11:00 - 14:00
                     for (let hour = 11; hour <= 14; hour++) {
                         let endMinute = (hour === 14) ? 0 : 45;
                         for (let min = 0; min <= endMinute; min += 15) {
@@ -1013,6 +1019,7 @@
                         }
                     }
                 } else if (dayOfWeek === 6) {
+                    // Samstag: 11:00 - 15:00
                     for (let hour = 11; hour <= 15; hour++) {
                         let endMinute = (hour === 15) ? 0 : 45;
                         for (let min = 0; min <= endMinute; min += 15) {
@@ -1332,13 +1339,19 @@
         if (dateParts.length === 3) {
             const selectedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
             const dayOfWeek = selectedDate.getDay();
-            // Erlaube Samstag (6), Sonntag (0) und den speziellen 17.08.2026
+            // Erlaube Samstag (6), Sonntag (0)
+            // Der 17.08.2026 ist ein MONTAG - wird für Party NICHT erlaubt (nur Sa/So)
             const isSpecialDay = selectedDate.getFullYear() === 2026 && 
                                  selectedDate.getMonth() === 7 && 
                                  selectedDate.getDate() === 17;
             if (dayOfWeek !== 6 && dayOfWeek !== 0 && !isSpecialDay) {
                 const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
                 alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}`);
+                return;
+            }
+            // Zusätzliche Prüfung: Wenn es der 17.08. ist (Montag), Party nicht erlauben
+            if (isSpecialDay) {
+                alert(`❌ Am 17.08.2026 (Montag) haben wir zwar geöffnet, aber PARTY-SERVICE ist NUR an Samstagen und Sonntagen möglich.\n\nBitte wählen Sie einen Samstag oder Sonntag.`);
                 return;
             }
         }
