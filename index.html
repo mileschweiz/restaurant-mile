@@ -73,16 +73,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;
             flex-wrap: wrap;
         }
         .qrcode-banner img {
-            max-height: 60px;
+            max-height: 100px;  /* Größer gemacht */
             width: auto;
             border-radius: 8px;
         }
         .qrcode-banner .banner-text {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: #b45f2b;
             font-weight: 500;
         }
@@ -637,7 +637,7 @@
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
             .gallery-item img { height: 150px; }
             .qrcode-banner { flex-direction: column; text-align: center; padding: 0.8rem; }
-            .qrcode-banner img { max-height: 50px; }
+            .qrcode-banner img { max-height: 80px; }
             .scroll-top-btn {
                 width: 48px;
                 height: 48px;
@@ -871,13 +871,62 @@
     // ========== 生成二维码（用于上方 Banner） ==========
     function generateQRCode() {
         const websiteUrl = 'https://mileschweiz.github.io/restaurant-mile/';
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(websiteUrl)}`;
+        // 使用 200x200 像素生成更大的二维码
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(websiteUrl)}`;
         document.getElementById('qrcodeBannerImage').src = qrApiUrl;
     }
     
+    // Restaurant-Telefonnummer für WhatsApp (ohne +)
     const RESTAURANT_PHONE = '41774614837';
+    // Kundentelefonnummer für die Bestätigungsnachricht (wird vom Kunden eingegeben)
+    let customerPhone = '';
     
-    function sendWhatsAppOrder(orderDetails) {
+    // ========== NEUE FUNKTION: Bestätigungsnachricht an Kunden senden ==========
+    function sendConfirmationToCustomer(orderDetails) {
+        // Hier wird eine Nachricht an den Kunden gesendet, dass die Bestellung eingegangen ist
+        // Die Kundennummer muss vom Kunden eingegeben werden (z.B. über ein kleines Formular)
+        // Da wir kein separates Formular haben, fragen wir den Kunden nach seiner Nummer
+        if (!customerPhone) {
+            // Nachfrage nach der Telefonnummer für die Bestätigung
+            const phoneInput = prompt('📱 Bitte geben Sie Ihre Telefonnummer für die Bestellbestätigung ein (z.B. 41791234567):');
+            if (!phoneInput) {
+                alert('⚠️ Ohne Telefonnummer können wir keine Bestätigung senden. Die Bestellung wurde trotzdem an uns übermittelt.');
+                return;
+            }
+            // Einfache Validierung: nur Zahlen und eventuell + am Anfang
+            const cleanedPhone = phoneInput.replace(/[^0-9+]/g, '');
+            if (cleanedPhone.length < 10) {
+                alert('⚠️ Die eingegebene Nummer scheint ungültig zu sein. Bitte versuchen Sie es erneut.');
+                // Wir versuchen es noch einmal
+                sendConfirmationToCustomer(orderDetails);
+                return;
+            }
+            customerPhone = cleanedPhone;
+        }
+        
+        // Bestätigungsnachricht für den Kunden
+        const confirmationMessage = `✅ *Ihre Bestellung bei Restaurant Mile ist eingegangen!* ✅%0A%0A` +
+            `Vielen Dank für Ihre Bestellung. Wir bereiten alles für Sie vor.%0A%0A` +
+            `📋 *Ihre Bestellung:*%0A` +
+            `${orderDetails.items}%0A%0A` +
+            `💰 *Gesamtbetrag:* CHF ${orderDetails.total}%0A` +
+            `📅 *Abholung:* ${orderDetails.pickupDate} um ${orderDetails.pickupTime} Uhr%0A%0A` +
+            `📍 Restaurant Mile, Markgasse 16, 9450 Altstätten%0A` +
+            `☎️ 071 755 08 88%0A%0A` +
+            `💚 Wir freuen uns auf Ihren Besuch!`;
+        
+        // WhatsApp-Nachricht an den Kunden senden
+        const customerWhatsAppUrl = `https://wa.me/${customerPhone}?text=${confirmationMessage}`;
+        
+        // Öffnen in einem neuen Tab, damit der Kunde die Nachricht sieht und senden kann
+        window.open(customerWhatsAppUrl, '_blank');
+        
+        showToast('✅ Bestellbestätigung wurde an den Kunden gesendet!');
+    }
+    
+    // ========== Bestellfunktion mit Kundenbestätigung ==========
+    function sendWhatsAppOrder(orderDetails, sendConfirmation = true) {
+        // 1. Bestellung an das Restaurant senden
         let message = `🍽️ *NEUE BESTELLUNG - Restaurant Mile* 🍽️%0A%0A`;
         message += `${orderDetails.items}%0A%0A`;
         if (orderDetails.total) {
@@ -891,7 +940,15 @@
         message += `☎️ 071 755 08 88`;
         
         const whatsappUrl = `https://wa.me/${RESTAURANT_PHONE}?text=${message}`;
-        window.location.href = whatsappUrl;
+        window.open(whatsappUrl, '_blank');
+        
+        // 2. Bestätigung an den Kunden senden (wenn gewünscht)
+        if (sendConfirmation) {
+            // Wir warten kurz, damit der Restaurant-Tab geöffnet wird, dann die Kundenbestätigung
+            setTimeout(() => {
+                sendConfirmationToCustomer(orderDetails);
+            }, 500);
+        }
     }
     
     // ========== 生成取餐时间下拉菜单 ==========
@@ -1288,15 +1345,18 @@
         alert(orderSummary);
         showToast("✅ Party-Anfrage gesendet! Wir melden uns bei Ihnen.");
         
+        // Party-Anfrage mit Bestätigung an Kunden
+        const formattedDate = partyDate;
         sendWhatsAppOrder({
             items: orderSummary,
             total: grandTotal.toFixed(2),
-            pickupDate: partyDate,
+            pickupDate: formattedDate,
             pickupTime: partyTime,
             notes: specialWishes
-        });
+        }, true); // true = Bestätigung an Kunden senden
     });
 
+    // ========== AKTUALISIERTE BESTELLFUNKTION mit Kundenbestätigung ==========
     function handleCashPayment() {
         const pickupDateTime = document.getElementById('pickupDateTimeSelect')?.value;
         
@@ -1321,13 +1381,14 @@
         
         alert(`🏪 Bezahlung vor Ort (Bar oder Karte)\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bezahlen. Vielen Dank!`);
         
+        // Bestellung an Restaurant senden UND Bestätigung an Kunden
         sendWhatsAppOrder({
             items: itemsText,
             total: sum.toFixed(2),
             pickupDate: formattedDate,
             pickupTime: timeStr,
             notes: ""
-        });
+        }, true); // true = Bestätigung an Kunden senden
         
         cart = []; 
         renderCart(); 
