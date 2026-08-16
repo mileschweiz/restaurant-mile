@@ -65,38 +65,50 @@
             background: rgba(255,255,255,0.32);
         }
 
-        /* ===== QR Code Banner oben ===== */
-        .qrcode-banner {
+        /* ===== INFO BANNER mit QR-Code und Öffnungszeiten nebeneinander ===== */
+        .info-banner {
             background: #fef8f0;
             border-bottom: 1px solid #e8e0d0;
-            padding: 0.6rem 1rem;
+            padding: 0.8rem 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1.5rem;
+            gap: 2.5rem;
             flex-wrap: wrap;
         }
-        .qrcode-banner img {
-            max-height: 100px;  /* Größer gemacht */
-            width: auto;
-            border-radius: 8px;
+        .info-banner .qr-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
-        .qrcode-banner .banner-text {
+        .info-banner .qr-section img {
+            max-height: 150px;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .info-banner .qr-section .qr-text {
             font-size: 0.95rem;
             color: #b45f2b;
             font-weight: 500;
         }
-        .qrcode-banner .banner-text span {
+        .info-banner .qr-section .qr-text span {
             font-weight: 700;
         }
-
-        .hours-banner {
-            background: #e0e8f0;
-            color: #6a7e8e;
+        .info-banner .hours-section {
+            font-size: 0.95rem;
+            color: #5a6e7e;
+            line-height: 1.6;
             text-align: center;
-            padding: 0.8rem;
-            font-weight: 500;
-            font-size: 0.9rem;
+            border-left: 2px solid #e8e0d0;
+            padding-left: 2rem;
+        }
+        .info-banner .hours-section strong {
+            color: #7e9eb5;
+        }
+        .info-banner .hours-section .special-day {
+            color: #c27e4a;
+            font-weight: 700;
         }
 
         .container {
@@ -636,8 +648,10 @@
             .datetime-wrapper { flex-direction: column; }
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
             .gallery-item img { height: 150px; }
-            .qrcode-banner { flex-direction: column; text-align: center; padding: 0.8rem; }
-            .qrcode-banner img { max-height: 80px; }
+            .info-banner { flex-direction: column; text-align: center; padding: 0.8rem; gap: 1rem; }
+            .info-banner .hours-section { border-left: none; padding-left: 0; border-top: 1px solid #e8e0d0; padding-top: 1rem; }
+            .info-banner .qr-section { flex-direction: column; }
+            .info-banner .qr-section img { max-height: 120px; }
             .scroll-top-btn {
                 width: 48px;
                 height: 48px;
@@ -649,6 +663,7 @@
         @media (max-width: 480px) {
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
             .gallery-item img { height: 120px; }
+            .info-banner .qr-section img { max-height: 100px; }
         }
     </style>
 </head>
@@ -671,18 +686,22 @@
     </div>
 </div>
 
-<!-- ===== QR CODE BANNER OBEN ===== -->
-<div class="qrcode-banner" id="qrcodeBanner">
-    <img id="qrcodeBannerImage" src="" alt="QR Code">
-    <div class="banner-text">
-        📱 <span>WhatsApp Bestellung</span> – Einfach scannen und loslegen!
+<!-- ===== INFO BANNER mit QR-Code und Öffnungszeiten NEBENEINANDER ===== -->
+<div class="info-banner" id="infoBanner">
+    <div class="qr-section">
+        <img id="qrcodeBannerImage" src="" alt="QR Code">
+        <div class="qr-text">
+            📱 <span>WhatsApp Bestellung</span><br>
+            Einfach scannen und loslegen!
+        </div>
     </div>
-</div>
-
-<div class="hours-banner" id="hoursBanner">
-    📍 Markgasse 16, 9450 Altstätten | ☎️ 071 755 08 88<br>
-    🕐 Di - Fr 11:00 - 14:00 · Sa 11:00 - 15:00<br>
-    🎉 Party-Service: NUR Samstag & Sonntag · ab 10 Personen · Erwachsene CHF 20.- / Kinder CHF 15.- (nur Essen) 🎉
+    <div class="hours-section">
+        📍 Markgasse 16, 9450 Altstätten | ☎️ 071 755 08 88<br>
+        <strong>🕐 Öffnungszeiten:</strong><br>
+        Di - Fr 11:00 - 14:00 · Sa 11:00 - 15:00<br>
+        <span class="special-day">⭐ Sonderöffnung: So 17.08.2026 11:00 - 14:00 ⭐</span><br>
+        🎉 Party-Service: NUR Samstag & Sonntag · ab 10 Personen
+    </div>
 </div>
 
 <!-- ===== BILDERGALERIE ===== -->
@@ -717,7 +736,7 @@
                     <option value="">-- Bitte wählen Sie eine Abholzeit --</option>
                 </select>
                 <p style="font-size:0.7rem; color:#8a9bb0; margin-top:0.3rem;">
-                    Di-Fr 11:00-14:00 · Sa 11:00-15:00 (alle 15 Minuten)
+                    Di-Fr 11:00-14:00 · Sa 11:00-15:00 · So 17.08.2026 11:00-14:00 (alle 15 Minuten)
                 </p>
             </div>
             
@@ -850,6 +869,7 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
+        // Erlaube Samstag (6), Sonntag (0) und den speziellen 17.08.2026
         flatpickr(datePicker, {
             locale: 'de',
             dateFormat: 'd.m.Y',
@@ -857,7 +877,12 @@
             minDate: today,
             disable: [
                 function(date) {
-                    return (date.getDay() !== 6 && date.getDay() !== 0);
+                    // Prüfe ob es der 17.08.2026 ist
+                    const isSpecialDay = date.getFullYear() === 2026 && 
+                                         date.getMonth() === 7 && 
+                                         date.getDate() === 17;
+                    // Erlaube Samstag (6), Sonntag (0) und den speziellen Tag
+                    return (date.getDay() !== 6 && date.getDay() !== 0) && !isSpecialDay;
                 }
             ],
             onChange: function(selectedDates, dateStr, instance) {
@@ -871,8 +896,8 @@
     // ========== 生成二维码（用于上方 Banner） ==========
     function generateQRCode() {
         const websiteUrl = 'https://mileschweiz.github.io/restaurant-mile/';
-        // 使用 200x200 像素生成更大的二维码
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(websiteUrl)}`;
+        // Großer QR-Code mit 250x250 Pixeln
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(websiteUrl)}`;
         document.getElementById('qrcodeBannerImage').src = qrApiUrl;
     }
     
@@ -883,28 +908,21 @@
     
     // ========== NEUE FUNKTION: Bestätigungsnachricht an Kunden senden ==========
     function sendConfirmationToCustomer(orderDetails) {
-        // Hier wird eine Nachricht an den Kunden gesendet, dass die Bestellung eingegangen ist
-        // Die Kundennummer muss vom Kunden eingegeben werden (z.B. über ein kleines Formular)
-        // Da wir kein separates Formular haben, fragen wir den Kunden nach seiner Nummer
         if (!customerPhone) {
-            // Nachfrage nach der Telefonnummer für die Bestätigung
             const phoneInput = prompt('📱 Bitte geben Sie Ihre Telefonnummer für die Bestellbestätigung ein (z.B. 41791234567):');
             if (!phoneInput) {
                 alert('⚠️ Ohne Telefonnummer können wir keine Bestätigung senden. Die Bestellung wurde trotzdem an uns übermittelt.');
                 return;
             }
-            // Einfache Validierung: nur Zahlen und eventuell + am Anfang
             const cleanedPhone = phoneInput.replace(/[^0-9+]/g, '');
             if (cleanedPhone.length < 10) {
                 alert('⚠️ Die eingegebene Nummer scheint ungültig zu sein. Bitte versuchen Sie es erneut.');
-                // Wir versuchen es noch einmal
                 sendConfirmationToCustomer(orderDetails);
                 return;
             }
             customerPhone = cleanedPhone;
         }
         
-        // Bestätigungsnachricht für den Kunden
         const confirmationMessage = `✅ *Ihre Bestellung bei Restaurant Mile ist eingegangen!* ✅%0A%0A` +
             `Vielen Dank für Ihre Bestellung. Wir bereiten alles für Sie vor.%0A%0A` +
             `📋 *Ihre Bestellung:*%0A` +
@@ -915,18 +933,13 @@
             `☎️ 071 755 08 88%0A%0A` +
             `💚 Wir freuen uns auf Ihren Besuch!`;
         
-        // WhatsApp-Nachricht an den Kunden senden
         const customerWhatsAppUrl = `https://wa.me/${customerPhone}?text=${confirmationMessage}`;
-        
-        // Öffnen in einem neuen Tab, damit der Kunde die Nachricht sieht und senden kann
         window.open(customerWhatsAppUrl, '_blank');
-        
         showToast('✅ Bestellbestätigung wurde an den Kunden gesendet!');
     }
     
     // ========== Bestellfunktion mit Kundenbestätigung ==========
     function sendWhatsAppOrder(orderDetails, sendConfirmation = true) {
-        // 1. Bestellung an das Restaurant senden
         let message = `🍽️ *NEUE BESTELLUNG - Restaurant Mile* 🍽️%0A%0A`;
         message += `${orderDetails.items}%0A%0A`;
         if (orderDetails.total) {
@@ -942,9 +955,7 @@
         const whatsappUrl = `https://wa.me/${RESTAURANT_PHONE}?text=${message}`;
         window.open(whatsappUrl, '_blank');
         
-        // 2. Bestätigung an den Kunden senden (wenn gewünscht)
         if (sendConfirmation) {
-            // Wir warten kurz, damit der Restaurant-Tab geöffnet wird, dann die Kundenbestätigung
             setTimeout(() => {
                 sendConfirmationToCustomer(orderDetails);
             }, 500);
@@ -962,18 +973,37 @@
         const minTime = new Date(now.getTime() + 30 * 60000);
         const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
         
+        // Spezielle Öffnung am 17.08.2026 (Sonntag)
+        const specialDay = new Date(2026, 7, 17); // 17.08.2026
+        
         for (let i = 0; i <= 14; i++) {
             const date = new Date();
             date.setDate(now.getDate() + i);
             const dayOfWeek = date.getDay();
             
-            if (dayOfWeek >= 2 && dayOfWeek <= 6) {
+            // Prüfe ob es der spezielle Tag ist
+            const isSpecialDay = date.getFullYear() === 2026 && 
+                                 date.getMonth() === 7 && 
+                                 date.getDate() === 17;
+            
+            // Erlaube Di-Sa (2-6) und den speziellen Sonntag
+            if ((dayOfWeek >= 2 && dayOfWeek <= 6) || isSpecialDay) {
                 const dateStr = date.toISOString().split('T')[0];
                 const weekdayName = weekdays[dayOfWeek];
                 const formattedDate = `${dateStr.split('-')[2]}.${dateStr.split('-')[1]}.${dateStr.split('-')[0]}`;
                 
                 let times = [];
-                if (dayOfWeek >= 2 && dayOfWeek <= 5) {
+                if (isSpecialDay) {
+                    // Spezieller Sonntag: 11:00 - 14:00
+                    for (let hour = 11; hour <= 14; hour++) {
+                        let endMinute = (hour === 14) ? 0 : 45;
+                        for (let min = 0; min <= endMinute; min += 15) {
+                            if (hour === 14 && min > 0) continue;
+                            const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+                            times.push(timeStr);
+                        }
+                    }
+                } else if (dayOfWeek >= 2 && dayOfWeek <= 5) {
                     for (let hour = 11; hour <= 14; hour++) {
                         let endMinute = (hour === 14) ? 0 : 45;
                         for (let min = 0; min <= endMinute; min += 15) {
@@ -1000,7 +1030,10 @@
                     
                     if (timeDate >= minTime) {
                         const optionValue = `${dateStr}|${time}`;
-                        const optionText = `${formattedDate} (${weekdayName}) - ${time} Uhr`;
+                        let optionText = `${formattedDate} (${weekdayName}) - ${time} Uhr`;
+                        if (isSpecialDay) {
+                            optionText = `⭐ ${formattedDate} (Sonderöffnung) - ${time} Uhr ⭐`;
+                        }
                         const option = document.createElement('option');
                         option.value = optionValue;
                         option.textContent = optionText;
@@ -1045,14 +1078,12 @@
         { name: "Rot-Thai Currysoße", spice: "very", spiceText: "🌶️🌶️ sehr scharf" }
     ];
     
-    // Beilagen-Optionen für Hauptgerichte - Gedämpfter Reis ist Standard (ohne Aufpreis)
     const riceOptions = [
         { name: "Gedämpfter Reis (ohne Aufpreis)", value: "gedämpfter_reis", price: 0, isDefault: true },
         { name: "Gebratener Reis (+2.00 CHF)", value: "gebratener_reis", price: 2.00, isDefault: false },
         { name: "Gebratene Nudeln (+2.00 CHF)", value: "gebratene_nudeln", price: 2.00, isDefault: false }
     ];
 
-    // Mile Mix 可选主菜列表
     const mileMixMainDishes = [
         { name: "Poulet mit süss-saurer Sosse", price: 0 },
         { name: "Poulet mit malaysischer Currysosse", price: 0 },
@@ -1061,7 +1092,6 @@
         { name: "Knusprige Ente", price: 0 }
     ];
 
-    // Mile Mix 可选 Beilage - Gebratener Reis ist jetzt Standard
     const mileMixRiceOptions = [
         { name: "Gedämpfter Reis", value: "gedämpfter_reis", isDefault: false },
         { name: "Gebratener Reis", value: "gebratener_reis", isDefault: true },
@@ -1130,7 +1160,6 @@
                     <div class="menu-desc">${item.desc}</div>
                     <div class="menu-extras">`;
                 
-                // Mile Mix 特殊处理
                 if(item.mileMix) {
                     html += `<div class="milemix-group"><div class="group-title">🍚 Beilage wählen:</div>`;
                     mileMixRiceOptions.forEach((rice, idx) => {
@@ -1156,7 +1185,6 @@
                     html += `</div>`;
                 }
                 
-                // 处理 Hauptgerichte 的 Beilage-Optionen (三选一) - ohne "(eine inklusive)"
                 if(item.riceOptions && !item.mileMix) {
                     html += `<div class="extra-group"><div class="group-title">🍚 Beilage wählen:</div>`;
                     item.riceOptions.forEach((rice, idx) => {
@@ -1166,7 +1194,6 @@
                     html += `</div>`;
                 }
                 
-                // 处理其他 Extras (非 Hauptgerichte)
                 if(item.extras && item.extras.length && !item.mileMix && !item.riceOptions) {
                     item.extras.forEach((ex, idx) => {
                         let isRadio = (item.id === 21 || item.id === 23 || item.id === 25) ? 'radio' : 'checkbox';
@@ -1201,9 +1228,7 @@
         let extraPriceSum=0;
         let mainDishes = [];
         
-        // Mile Mix 特殊处理
         if(found.mileMix) {
-            // 获取选择的Beilage
             const riceInput = document.querySelector(`.menu-card[data-id="${itemId}"] .milemix-rice:checked`);
             if (!riceInput) {
                 alert("❌ Bitte wählen Sie eine Beilage für den Mile Mix aus.");
@@ -1211,7 +1236,6 @@
             }
             selectedRice = riceInput.value;
             
-            // 获取选择的主菜
             const mainInputs = document.querySelectorAll(`.menu-card[data-id="${itemId}"] .milemix-main:checked`);
             if (mainInputs.length !== 2) {
                 alert("❌ Bitte wählen Sie genau zwei Hauptgerichte für den Mile Mix aus.");
@@ -1219,7 +1243,6 @@
             }
             mainInputs.forEach(inp => mainDishes.push(inp.value));
         } else {
-            // 处理 Hauptgerichte 的 Beilage (riceOptions)
             if(found.riceOptions) {
                 const riceChecked = document.querySelector(`.menu-card[data-id="${itemId}"] .rice-radio:checked`);
                 if (riceChecked) {
@@ -1228,7 +1251,6 @@
                 }
             }
             
-            // 处理普通 extras (checkbox)
             if(!forcedExtras.length && !found.riceOptions) {
                 document.querySelectorAll(`.menu-card[data-id="${itemId}"] .item-extra:checked`).forEach(inp=>{ 
                     let name=inp.dataset.extraName; 
@@ -1247,7 +1269,6 @@
             itemName = `${found.name} (${selectedRice}) mit ${mainDishes.join(' & ')}`;
         } else {
             if(selectedSauce) itemName = `${found.name} mit ${selectedSauce}`;
-            // 只显示非默认的 Beilage (即只显示 Gebratener Reis 或 Gebratene Nudeln)
             if(selectedRice && !found.mileMix && selectedRice !== "Gedämpfter Reis (ohne Aufpreis)") {
                 itemName = `${itemName} (${selectedRice})`;
             }
@@ -1259,13 +1280,9 @@
         let total = (basePrice + extraPriceSum) * quantity;
         cart.push({ id: Date.now()+Math.random(), name: itemName, quantity, extras: selectedExtras, totalPrice: total });
         if(predefinedQty===null && document.getElementById(`qty-${itemId}`)) document.getElementById(`qty-${itemId}`).innerText="1";
-        // 清除所有选中的输入框
         document.querySelectorAll(`.menu-card[data-id="${itemId}"] input:checked`).forEach(i=>{
-            // 如果是 radio 且是默认选项，保留选中状态
             if(i.classList.contains('rice-radio') && i.dataset.ricePrice === '0') {
-                // 保留默认选项
             } else if(i.classList.contains('milemix-rice') && i.defaultChecked) {
-                // 保留 Mile Mix 默认选项
             } else {
                 i.checked = false;
             }
@@ -1315,7 +1332,11 @@
         if (dateParts.length === 3) {
             const selectedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
             const dayOfWeek = selectedDate.getDay();
-            if (dayOfWeek !== 6 && dayOfWeek !== 0) {
+            // Erlaube Samstag (6), Sonntag (0) und den speziellen 17.08.2026
+            const isSpecialDay = selectedDate.getFullYear() === 2026 && 
+                                 selectedDate.getMonth() === 7 && 
+                                 selectedDate.getDate() === 17;
+            if (dayOfWeek !== 6 && dayOfWeek !== 0 && !isSpecialDay) {
                 const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
                 alert(`❌ Party-Service ist NUR an Samstagen und Sonntagen möglich.\n\nIhr gewählter Tag: ${weekdays[dayOfWeek]}`);
                 return;
@@ -1345,7 +1366,6 @@
         alert(orderSummary);
         showToast("✅ Party-Anfrage gesendet! Wir melden uns bei Ihnen.");
         
-        // Party-Anfrage mit Bestätigung an Kunden
         const formattedDate = partyDate;
         sendWhatsAppOrder({
             items: orderSummary,
@@ -1353,10 +1373,9 @@
             pickupDate: formattedDate,
             pickupTime: partyTime,
             notes: specialWishes
-        }, true); // true = Bestätigung an Kunden senden
+        }, true);
     });
 
-    // ========== AKTUALISIERTE BESTELLFUNKTION mit Kundenbestätigung ==========
     function handleCashPayment() {
         const pickupDateTime = document.getElementById('pickupDateTimeSelect')?.value;
         
@@ -1381,14 +1400,13 @@
         
         alert(`🏪 Bezahlung vor Ort (Bar oder Karte)\n\n📋 Bestellung:\n${cart.map(i=>`${i.quantity}x ${i.name}`).join('\n')}\n\n💰 Gesamtbetrag: CHF ${sum.toFixed(2)}\n📅 Abholdatum: ${formattedDate}\n⏰ Abholzeit: ${timeStr} Uhr\n\n✅ Bitte bei Abholung bezahlen. Vielen Dank!`);
         
-        // Bestellung an Restaurant senden UND Bestätigung an Kunden
         sendWhatsAppOrder({
             items: itemsText,
             total: sum.toFixed(2),
             pickupDate: formattedDate,
             pickupTime: timeStr,
             notes: ""
-        }, true); // true = Bestätigung an Kunden senden
+        }, true);
         
         cart = []; 
         renderCart(); 
@@ -1399,14 +1417,12 @@
     document.getElementById('cashPayBtn')?.addEventListener('click', handleCashPayment);
     document.getElementById('clearCartBtn')?.addEventListener('click',()=>{ cart=[]; renderCart(); showToast("Warenkorb geleert"); });
 
-    // ========== 导航滚动事件 ==========
     document.getElementById('navHome')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
     document.getElementById('navMenu')?.addEventListener('click',()=>document.getElementById('menuSection')?.scrollIntoView({behavior:'smooth'}));
     document.getElementById('navGallery')?.addEventListener('click',()=>document.getElementById('gallerySection')?.scrollIntoView({behavior:'smooth'}));
     document.getElementById('navParty')?.addEventListener('click',()=>document.getElementById('partyServiceBox')?.scrollIntoView({behavior:'smooth'}));
     document.getElementById('navContact')?.addEventListener('click',()=>document.querySelector('.footer')?.scrollIntoView({behavior:'smooth'}));
     
-    // ========== "Nach oben" Button Funktionalität ==========
     const scrollBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 300) {
@@ -1419,7 +1435,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
-    // ========== 初始化所有功能 ==========
     renderGallery();
     generateMenu();
     generatePickupDateTimeOptions();
